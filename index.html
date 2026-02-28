@@ -1,0 +1,555 @@
+
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI Multi-Persona Chatbot Platform | Portfolio</title>
+  <meta name="description" content="Production-ready AI chatbot platform with JWT Auth, RAG (embeddings + FAISS), and streaming responses (SSE). Built with FastAPI + Docker." />
+  <meta property="og:title" content="AI Multi-Persona Chatbot Platform | Portfolio" />
+  <meta property="og:description" content="JWT Auth • RAG (Embeddings + FAISS) • Streaming (SSE) • FastAPI • Docker • Observability" />
+  <meta property="og:type" content="website" />
+  <style>
+    :root{
+      --bg:#0b1020;
+      --card:#121a33;
+      --card2:#0f1630;
+      --text:#e9ecff;
+      --muted:#b8c1ff;
+      --muted2:#93a0ff;
+      --line:#243055;
+      --accent:#7c5cff;
+      --accent2:#35d3ff;
+      --ok:#49e29b;
+      --warn:#ffce5c;
+      --bad:#ff5c7a;
+      --shadow: 0 18px 40px rgba(0,0,0,.35);
+      --radius: 18px;
+      --radius2: 28px;
+      --max: 1120px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 15% -10%, rgba(124,92,255,.35), transparent 60%),
+        radial-gradient(900px 500px at 90% 0%, rgba(53,211,255,.22), transparent 55%),
+        radial-gradient(900px 600px at 50% 110%, rgba(73,226,155,.10), transparent 60%),
+        var(--bg);
+      line-height:1.5;
+    }
+    a{color:inherit;text-decoration:none}
+    .wrap{max-width:var(--max);margin:0 auto;padding:24px}
+    .nav{
+      display:flex;align-items:center;justify-content:space-between;
+      gap:16px;padding:14px 18px;border:1px solid rgba(255,255,255,.08);
+      border-radius:999px;background:rgba(18,26,51,.65);backdrop-filter: blur(10px);
+      position:sticky;top:18px;z-index:50;
+    }
+    .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.2px}
+    .logo{
+      width:36px;height:36px;border-radius:12px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow: 0 10px 22px rgba(124,92,255,.25);
+    }
+    .navlinks{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:flex-end}
+    .navlinks a{
+      color:var(--muted);font-weight:600;font-size:14px;padding:8px 10px;border-radius:999px;
+      border:1px solid transparent;
+    }
+    .navlinks a:hover{color:var(--text);border-color:rgba(255,255,255,.12);background:rgba(255,255,255,.04)}
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;gap:10px;
+      padding:12px 14px;border-radius:999px;font-weight:700;font-size:14px;
+      border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);
+      transition: transform .12s ease, background .12s ease, border-color .12s ease;
+      cursor:pointer;
+    }
+    .btn:hover{transform: translateY(-1px);background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.18)}
+    .btn.primary{
+      background: linear-gradient(135deg, rgba(124,92,255,.95), rgba(53,211,255,.65));
+      border-color: rgba(124,92,255,.35);
+      box-shadow: 0 18px 44px rgba(124,92,255,.22);
+    }
+    .btn.primary:hover{background: linear-gradient(135deg, rgba(124,92,255,1), rgba(53,211,255,.75))}
+    .hero{padding:58px 0 18px}
+    .grid{display:grid;gap:18px}
+    .heroGrid{grid-template-columns: 1.15fr .85fr; align-items:stretch}
+    @media (max-width: 960px){ .heroGrid{grid-template-columns:1fr} .nav{position:static;border-radius:var(--radius)} }
+    .h1{
+      font-size:46px;line-height:1.05;margin:0 0 16px;font-weight:900;
+      letter-spacing:-.8px;
+    }
+    @media (max-width: 560px){ .h1{font-size:38px} }
+    .sub{color:var(--muted);font-size:16px;margin:0 0 22px;max-width:60ch}
+    .pillRow{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 26px}
+    .pill{
+      padding:9px 12px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(18,26,51,.55);
+      color:var(--muted);
+      font-weight:700;font-size:13px;
+    }
+    .pill b{color:var(--text)}
+    .card{
+      border-radius: var(--radius2);
+      border:1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, rgba(18,26,51,.72), rgba(15,22,48,.55));
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .cardIn{padding:18px}
+    .cardTitle{font-weight:900;font-size:14px;letter-spacing:.2px;color:var(--text);margin:0 0 10px}
+    .code{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size:13px;color:#dfe4ff;
+      background: rgba(0,0,0,.26);
+      border: 1px solid rgba(255,255,255,.08);
+      padding:14px;border-radius:14px;
+      overflow:auto;
+      line-height:1.45;
+    }
+    .kpiGrid{grid-template-columns: repeat(3, 1fr)}
+    @media (max-width: 900px){ .kpiGrid{grid-template-columns:1fr} }
+    .kpi{padding:18px}
+    .kpi h3{margin:0 0 6px;font-size:14px;color:var(--muted)}
+    .kpi p{margin:0;font-size:22px;font-weight:900}
+    .section{padding:38px 0}
+    .section h2{margin:0 0 14px;font-size:26px;font-weight:900;letter-spacing:-.2px}
+    .section p.lead{margin:0 0 18px;color:var(--muted);max-width:78ch}
+    .twoCol{grid-template-columns:1fr 1fr}
+    @media (max-width: 960px){ .twoCol{grid-template-columns:1fr} }
+    .featureGrid{grid-template-columns: repeat(3, 1fr)}
+    @media (max-width: 980px){ .featureGrid{grid-template-columns:1fr} }
+    .feat{padding:18px}
+    .feat .tag{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:6px 10px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color:var(--muted);font-weight:800;font-size:12px;
+      margin-bottom:12px;
+    }
+    .dot{width:10px;height:10px;border-radius:999px;background:var(--accent)}
+    .feat h3{margin:0 0 8px;font-size:16px;font-weight:900}
+    .feat p{margin:0;color:var(--muted);font-size:14px}
+    .shot{
+      aspect-ratio: 16/10;
+      border-radius: var(--radius2);
+      border:1px dashed rgba(255,255,255,.20);
+      background: rgba(255,255,255,.04);
+      display:flex;align-items:center;justify-content:center;
+      color:var(--muted);
+      font-weight:800;
+      overflow:hidden;
+    }
+    .shot img{width:100%;height:100%;object-fit:cover;display:block}
+    .list{margin:0;padding-left:18px;color:var(--muted)}
+    .list li{margin:8px 0}
+    .callout{
+      padding:18px;border-radius: var(--radius2);
+      background: linear-gradient(135deg, rgba(124,92,255,.20), rgba(53,211,255,.12));
+      border:1px solid rgba(124,92,255,.28);
+    }
+    .callout h3{margin:0 0 10px;font-size:16px;font-weight:900}
+    .callout p{margin:0;color:var(--muted)}
+    .footer{
+      padding:28px 0 36px;color:var(--muted);
+      border-top:1px solid rgba(255,255,255,.10);
+      margin-top:30px;
+    }
+    .footer a{color:var(--text);font-weight:800}
+    .mini{font-size:12px;color:var(--muted2)}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .spacer{height:10px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <!-- NAV -->
+    <header class="nav">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <div style="line-height:1.1">AI Multi-Persona Chatbot</div>
+          <div class="mini">JWT • RAG • Streaming • FastAPI • Docker</div>
+        </div>
+      </div>
+
+      <nav class="navlinks">
+        <a href="#features">Features</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#screenshots">Screenshots</a>
+        <a href="#how-to-run">Run</a>
+        <a href="#about">About</a>
+        <a class="btn primary" href="https://github.com/YOUR_GITHUB_USERNAME/ai-multi-persona-chatbot-platform" target="_blank" rel="noopener">
+          View on GitHub →
+        </a>
+      </nav>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="grid heroGrid">
+        <div>
+          <h1 class="h1">Production-Ready AI Chatbot Platform</h1>
+          <p class="sub">
+            A portfolio-grade system that demonstrates real engineering:
+            <b>JWT authentication</b>, <b>RAG document retrieval with embeddings</b>, and
+            <b>streaming responses (SSE)</b> — all wrapped in a clean FastAPI architecture and Dockerized for deployment.
+          </p>
+
+          <div class="pillRow">
+            <div class="pill"><b>3 Personas</b>: Support • AI Tutor • Architect</div>
+            <div class="pill"><b>RAG</b>: Upload + FAISS search</div>
+            <div class="pill"><b>Streaming</b>: Server-Sent Events</div>
+            <div class="pill"><b>Auth</b>: JWT protected routes</div>
+            <div class="pill"><b>Ops</b>: Structured logs + health</div>
+          </div>
+
+          <div class="row">
+            <a class="btn primary" href="#how-to-run">Run locally in 2 minutes</a>
+            <a class="btn" href="#screenshots">See screenshots</a>
+            <a class="btn" href="https://github.com/YOUR_GITHUB_USERNAME/ai-multi-persona-chatbot-platform#readme" target="_blank" rel="noopener">
+              Read the docs
+            </a>
+          </div>
+
+          <div class="spacer"></div>
+
+          <div class="grid kpiGrid">
+            <div class="card kpi">
+              <div class="cardIn">
+                <h3>Backend</h3>
+                <p>FastAPI + Async</p>
+                <div class="mini">Schema validation, error mapping</div>
+              </div>
+            </div>
+            <div class="card kpi">
+              <div class="cardIn">
+                <h3>AI</h3>
+                <p>RAG + Embeddings</p>
+                <div class="mini">Upload docs → retrieve → ground replies</div>
+              </div>
+            </div>
+            <div class="card kpi">
+              <div class="cardIn">
+                <h3>UX</h3>
+                <p>Streaming SSE</p>
+                <div class="mini">Incremental tokens, responsive chat feel</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quickstart Card -->
+        <aside class="card">
+          <div class="cardIn">
+            <div class="cardTitle">Quickstart</div>
+            <div class="code">
+              # 1) Clone<br/>
+              git clone https://github.com/YOUR_GITHUB_USERNAME/ai-multi-persona-chatbot-platform<br/>
+              cd ai-multi-persona-chatbot-platform<br/><br/>
+              # 2) Configure<br/>
+              cp .env.example .env<br/>
+              # set OPENAI_API_KEY + JWT_SECRET<br/><br/>
+              # 3) Run<br/>
+              docker compose up --build<br/><br/>
+              # API<br/>
+              http://localhost:8000/health
+            </div>
+            <div class="spacer"></div>
+            <div class="row">
+              <a class="btn" href="#architecture">View architecture</a>
+              <a class="btn" href="#how-to-run">Run instructions</a>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section id="features" class="section">
+      <h2>What this project demonstrates</h2>
+      <p class="lead">
+        Recruiter-friendly, engineering-heavy: security, reliability, observability, AI grounding, and deployable packaging.
+      </p>
+
+      <div class="grid featureGrid">
+        <div class="card feat">
+          <div class="cardIn">
+            <div class="tag"><span class="dot"></span>JWT Authentication</div>
+            <h3>Protected endpoints + token expiry</h3>
+            <p>
+              Login endpoint issues JWTs; chat + upload endpoints require a valid token. Clear 403 responses for invalid/expired tokens.
+            </p>
+          </div>
+        </div>
+
+        <div class="card feat">
+          <div class="cardIn">
+            <div class="tag"><span class="dot" style="background:var(--ok)"></span>RAG with Embeddings</div>
+            <h3>Upload documents → retrieval → grounded context</h3>
+            <p>
+              Documents are chunked, embedded, indexed (FAISS), retrieved (top-k), and injected into the prompt for better accuracy.
+            </p>
+          </div>
+        </div>
+
+        <div class="card feat">
+          <div class="cardIn">
+            <div class="tag"><span class="dot" style="background:var(--accent2)"></span>Streaming Responses (SSE)</div>
+            <h3>Token streaming for real-time UX</h3>
+            <p>
+              Server-Sent Events stream partial output so the UI feels responsive and production-ready.
+            </p>
+          </div>
+        </div>
+
+        <div class="card feat">
+          <div class="cardIn">
+            <div class="tag"><span class="dot" style="background:var(--warn)"></span>Observability</div>
+            <h3>Structured logs + request IDs</h3>
+            <p>
+              Every request is traceable with request IDs; upstream errors map to clean 502s; health endpoint supports monitoring.
+            </p>
+          </div>
+        </div>
+
+        <div class="card feat">
+          <div class="cardIn">
+            <div class="tag"><span class="dot" style="background:var(--bad)"></span>Error Handling</div>
+            <h3>Explicit, documented failure modes</h3>
+            <p>
+              422 validation errors, 403 auth failures, 502 upstream LLM failures, and 500 internal errors with safe responses.
+            </p>
+          </div>
+        </div>
+
+        <div class="card feat">
+          <div class="cardIn">
+            <div class="tag"><span class="dot" style="background:#ffd1ff"></span>Dockerized</div>
+            <h3>Runs anywhere</h3>
+            <p>
+              Docker + docker-compose provide consistent execution across dev machines, demos, and deployment targets.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="spacer"></div>
+      <div class="callout">
+        <h3>Why this stands out</h3>
+        <p>
+          It shows you can ship real systems: authentication, retrieval architecture, streaming UX, and operational discipline — not just prompt engineering.
+        </p>
+      </div>
+    </section>
+
+    <!-- ARCHITECTURE -->
+    <section id="architecture" class="section">
+      <h2>Architecture</h2>
+      <p class="lead">
+        Clean separation of concerns: API routing, authentication, retrieval, and LLM provider abstraction.
+      </p>
+
+      <div class="grid twoCol">
+        <div class="card">
+          <div class="cardIn">
+            <div class="cardTitle">High-level flow</div>
+            <div class="code">
+              Browser UI<br/>
+              &nbsp;&nbsp;→ (JWT) FastAPI /chat-stream<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;→ Persona router selects system prompt<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;→ RAG retrieves top-k chunks from FAISS<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;→ LLM call (OpenAI-compatible API)<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;→ Stream tokens back via SSE
+            </div>
+
+            <div class="spacer"></div>
+            <div class="cardTitle">Key endpoints</div>
+            <ul class="list">
+              <li><b>POST /login</b> → returns JWT token</li>
+              <li><b>POST /upload</b> → index documents (RAG)</li>
+              <li><b>POST /chat</b> → non-stream reply</li>
+              <li><b>POST /chat-stream</b> → streaming SSE reply</li>
+              <li><b>GET /health</b> → service health</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="cardIn">
+            <div class="cardTitle">Diagram</div>
+
+            <!-- Option A: show an image -->
+            <!-- Replace with your real diagram image path -->
+            <div class="shot">
+              <!-- <img src="screenshots/architecture.png" alt="Architecture diagram"> -->
+              Drop your diagram image here: <code>screenshots/architecture.png</code>
+            </div>
+
+            <div class="spacer"></div>
+            <div class="cardTitle">Design choices</div>
+            <ul class="list">
+              <li>Provider abstraction for easy LLM swaps</li>
+              <li>RAG layer isolated for future vector DB migration</li>
+              <li>Stateless API design (ready for scaling)</li>
+              <li>Explicit error mapping and safe responses</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREENSHOTS -->
+    <section id="screenshots" class="section">
+      <h2>Screenshots</h2>
+      <p class="lead">
+        Add 3–4 screenshots to show the UI, persona switch, document upload, and streaming output.
+        Keep them in a <code>screenshots/</code> folder and update the image sources below.
+      </p>
+
+      <div class="grid twoCol">
+        <div class="card">
+          <div class="cardIn">
+            <div class="cardTitle">Persona switching</div>
+            <div class="shot">
+              <!-- <img src="screenshots/persona-switch.png" alt="Persona switching"> -->
+              screenshots/persona-switch.png
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="cardIn">
+            <div class="cardTitle">RAG upload</div>
+            <div class="shot">
+              <!-- <img src="screenshots/rag-upload.png" alt="RAG upload"> -->
+              screenshots/rag-upload.png
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="cardIn">
+            <div class="cardTitle">Streaming demo</div>
+            <div class="shot">
+              <!-- <img src="screenshots/streaming-demo.png" alt="Streaming demo"> -->
+              screenshots/streaming-demo.png
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="cardIn">
+            <div class="cardTitle">Logs / observability</div>
+            <div class="shot">
+              <!-- <img src="screenshots/logs.png" alt="Logs"> -->
+              screenshots/logs.png
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOW TO RUN -->
+    <section id="how-to-run" class="section">
+      <h2>Run locally</h2>
+      <p class="lead">This is written to be demo-friendly: one command to run, predictable endpoints, and clear steps.</p>
+
+      <div class="grid twoCol">
+        <div class="card">
+          <div class="cardIn">
+            <div class="cardTitle">Docker (recommended)</div>
+            <div class="code">
+              cp .env.example .env<br/>
+              # set OPENAI_API_KEY + JWT_SECRET<br/><br/>
+              docker compose up --build<br/><br/>
+              # Health check<br/>
+              curl http://localhost:8000/health
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="cardIn">
+            <div class="cardTitle">Example API usage</div>
+            <div class="code">
+              # 1) Login to get token<br/>
+              curl -X POST http://localhost:8000/login<br/><br/>
+              # 2) Upload document (RAG)<br/>
+              curl -X POST http://localhost:8000/upload \<br/>
+              &nbsp;&nbsp;-H "Authorization: Bearer YOUR_TOKEN" \<br/>
+              &nbsp;&nbsp;-F "file=@docs/sample.txt"<br/><br/>
+              # 3) Stream chat (SSE)<br/>
+              curl -N -X POST http://localhost:8000/chat-stream \<br/>
+              &nbsp;&nbsp;-H "Authorization: Bearer YOUR_TOKEN" \<br/>
+              &nbsp;&nbsp;-H "Content-Type: application/json" \<br/>
+              &nbsp;&nbsp;-d '{"persona":"integration_architect","messages":[{"role":"user","content":"Design an event-driven integration."}]}'
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" class="section">
+      <h2>About</h2>
+      <p class="lead">
+        Replace the text below with your details. Keep it short and impact-focused.
+      </p>
+
+      <div class="grid twoCol">
+        <div class="card">
+          <div class="cardIn">
+            <div class="cardTitle">Your headline</div>
+            <p style="margin:0;color:var(--muted)">
+              <b>Colleen Cummings</b> — Senior Technical Consultant / Cloud & Integration Architect.
+              I build production-grade systems with strong reliability and security fundamentals.
+            </p>
+            <div class="spacer"></div>
+            <div class="row">
+              <a class="btn" href="https://www.linkedin.com/in/colleen-cummings-1b3b0b39" target="_blank" rel="noopener">LinkedIn</a>
+              <a class="btn" href="https://github.com/Geeklady55" target="_blank" rel="noopener">GitHub</a>
+              <a class="btn primary" href="mailto:YOUR_EMAIL@example.com">Email me</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="cardIn">
+            <div class="cardTitle">Resume bullets (paste into your resume)</div>
+            <ul class="list">
+              <li>Built a production-ready AI chatbot platform using <b>FastAPI</b> with clean routing, schema validation, and structured logging.</li>
+              <li>Implemented <b>JWT authentication</b> to secure chat and upload endpoints with explicit error handling.</li>
+              <li>Added <b>RAG</b> via document upload, embeddings, and <b>FAISS</b> vector search for grounded responses.</li>
+              <li>Implemented <b>streaming responses (SSE)</b> to improve UX and demonstrate real-time API patterns.</li>
+              <li>Containerized with <b>Docker</b> and documented operational behaviors for portfolio-grade presentation.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <div>© <span id="yr"></span> <a href="#">AI Multi-Persona Chatbot Platform</a></div>
+        <div class="mini">
+          Built with FastAPI • JWT • RAG • SSE • Docker
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+    document.getElementById("yr").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
+
+
+
