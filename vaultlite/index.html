@@ -1,1 +1,313 @@
 
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VaultLite | AWS Vault-Style Platform (Free Tier MVP)</title>
+  <style>
+    :root{
+      --bg:#0b1220;          /* deep navy */
+      --bg2:#0f172a;         /* navy */
+      --card:#111c33;        /* card navy */
+      --text:#e5e7eb;        /* light text */
+      --muted:#94a3b8;       /* muted */
+      --accent:#38bdf8;      /* electric blue */
+      --accent2:#22d3ee;     /* cyan */
+      --good:#34d399;        /* green */
+      --warn:#fbbf24;        /* amber */
+      --border:rgba(56,189,248,.18);
+      --shadow: 0 12px 30px rgba(0,0,0,.35);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 20% 0%, rgba(56,189,248,.12), transparent 60%),
+        radial-gradient(900px 500px at 80% 20%, rgba(34,211,238,.10), transparent 55%),
+        linear-gradient(180deg, var(--bg), var(--bg2));
+    }
+    a{color:var(--accent); text-decoration:none}
+    a:hover{color:var(--accent2)}
+    .wrap{max-width:1080px; margin:0 auto; padding:0 18px}
+    .nav{
+      position:sticky; top:0; z-index:20;
+      backdrop-filter: blur(10px);
+      background: rgba(11,18,32,.72);
+      border-bottom:1px solid rgba(56,189,248,.12);
+    }
+    .navInner{display:flex; align-items:center; justify-content:space-between; padding:14px 0}
+    .brand{display:flex; gap:10px; align-items:center; font-weight:800}
+    .dot{width:10px; height:10px; border-radius:999px; background:var(--accent); box-shadow:0 0 18px rgba(56,189,248,.55)}
+    .links{display:flex; gap:16px; flex-wrap:wrap; justify-content:flex-end}
+    .links a{font-weight:650; color:#cbd5e1}
+    .links a:hover{color:var(--accent2)}
+    .hero{padding:54px 0 22px}
+    .pill{
+      display:inline-flex; align-items:center; gap:10px;
+      padding:8px 12px; border:1px solid var(--border);
+      background: rgba(17,28,51,.65);
+      border-radius:999px; color:#cbd5e1; font-weight:650;
+    }
+    .h1{font-size:42px; line-height:1.08; margin:14px 0 10px; letter-spacing:-.02em}
+    .sub{max-width:820px; color:var(--muted); font-size:16px; line-height:1.65}
+    .ctaRow{display:flex; gap:12px; flex-wrap:wrap; margin-top:18px}
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:10px 14px; border-radius:10px;
+      border:1px solid var(--border);
+      background: rgba(17,28,51,.72);
+      color:var(--text); font-weight:750;
+      box-shadow: 0 0 0 rgba(0,0,0,0);
+      transition: transform .12s ease, box-shadow .12s ease;
+    }
+    .btn:hover{transform: translateY(-1px); box-shadow: var(--shadow)}
+    .btnPrimary{
+      background: linear-gradient(135deg, rgba(37,99,235,.95), rgba(56,189,248,.85));
+      border: 1px solid rgba(56,189,248,.35);
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap:14px;
+      margin:22px 0 52px;
+    }
+    .card{
+      grid-column: span 6;
+      background: rgba(17,28,51,.70);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:18px;
+      box-shadow: 0 10px 25px rgba(0,0,0,.25);
+    }
+    .card h3{margin:0 0 8px; font-size:18px}
+    .card p{margin:0; color:var(--muted); line-height:1.6}
+    .card ul{margin:12px 0 0; padding-left:18px; color:#cbd5e1}
+    .card li{margin:6px 0}
+    .section{padding:14px 0 0}
+    .section h2{margin:0 0 10px; font-size:22px}
+    .kvs{display:flex; flex-wrap:wrap; gap:8px}
+    .kv{
+      padding:8px 10px;
+      background: rgba(11,18,32,.55);
+      border:1px solid rgba(148,163,184,.18);
+      border-radius:999px;
+      color:#cbd5e1;
+      font-family:var(--mono);
+      font-size:12px;
+    }
+    .twoCol{display:grid; grid-template-columns: 1.1fr .9fr; gap:14px}
+    .code{
+      background: rgba(11,18,32,.65);
+      border:1px solid rgba(56,189,248,.14);
+      border-radius:14px;
+      padding:14px;
+      font-family:var(--mono);
+      font-size:12.5px;
+      color:#cbd5e1;
+      overflow:auto;
+      white-space:pre;
+      line-height:1.55;
+    }
+    .imgBox{
+      border:1px dashed rgba(56,189,248,.35);
+      border-radius:14px;
+      padding:14px;
+      color:var(--muted);
+      background: rgba(11,18,32,.35);
+    }
+    .imgBox img{width:100%; border-radius:12px; display:block}
+    .footer{
+      margin-top:52px;
+      padding:26px 0;
+      border-top:1px solid rgba(56,189,248,.12);
+      color:var(--muted);
+      font-size:13px;
+    }
+    @media (max-width: 900px){
+      .card{grid-column: span 12}
+      .twoCol{grid-template-columns: 1fr}
+      .h1{font-size:34px}
+    }
+  </style>
+</head>
+<body>
+
+  <header class="nav">
+    <div class="wrap navInner">
+      <div class="brand"><span class="dot"></span> VaultLite</div>
+      <nav class="links">
+        <a href="#summary">Summary</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#build">Build</a>
+        <a href="#security">Security</a>
+        <a href="#evidence">Evidence</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div class="pill">AWS Free Tier MVP • Vault-style document workflow platform</div>
+      <h1 class="h1">Veeva Vault–Inspired Platform on AWS (Free Options)</h1>
+      <p class="sub">
+        VaultLite is a serverless document platform MVP demonstrating secure storage, metadata, versioning,
+        role-based access, approval workflows, and audit trails — using AWS services that are Free Tier / low-cost friendly.
+      </p>
+      <div class="ctaRow">
+        <a class="btn btnPrimary" href="#architecture">View Architecture</a>
+        <a class="btn" href="#build">Step-by-Step Build</a>
+        <a class="btn" href="https://github.com/Geeklady55" target="_blank" rel="noreferrer">GitHub</a>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <h3>What it Includes</h3>
+          <ul>
+            <li>Secure document upload/download (S3 + pre-signed URLs)</li>
+            <li>Metadata + listing (DynamoDB)</li>
+            <li>RBAC (Cognito groups: Admin/Approver/Contributor/Viewer)</li>
+            <li>Workflow: Draft → Review → Approved/Rejected (Step Functions)</li>
+            <li>Audit trail per document (DynamoDB AuditEvents + CloudTrail Event History)</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Tech Stack</h3>
+          <div class="kvs">
+            <span class="kv">S3</span><span class="kv">DynamoDB</span><span class="kv">Lambda</span>
+            <span class="kv">API Gateway</span><span class="kv">Cognito</span><span class="kv">Step Functions</span>
+            <span class="kv">CloudWatch</span><span class="kv">CloudTrail</span>
+          </div>
+          <p style="margin-top:12px" class="sub">
+            Goal: demonstrate real platform patterns — auth, least privilege IAM, workflow orchestration,
+            auditability, and API-first design.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="summary" class="section">
+      <h2>Executive Summary</h2>
+      <div class="card" style="grid-column: span 12;">
+        <p>
+          This project shows how to design a “Vault-like” platform using serverless building blocks:
+          S3 for document storage, DynamoDB for metadata and audit events, Cognito for identity and groups,
+          API Gateway + Lambda for the API layer, and Step Functions for lifecycle workflows.
+        </p>
+      </div>
+    </section>
+
+    <section id="architecture" class="section">
+      <h2>Architecture</h2>
+      <div class="twoCol">
+        <div class="card">
+          <h3>High-Level Flow</h3>
+          <div class="code">User → Cognito (JWT)
+User → API Gateway → Lambda
+Lambda → DynamoDB (Documents, AuditEvents)
+Lambda → S3 (pre-signed upload/download URLs)
+Workflow actions → Step Functions → status updates + audit events
+Logs → CloudWatch
+AWS account activity → CloudTrail Event History</div>
+        </div>
+        <div class="imgBox">
+          <strong>Drop your architecture image here</strong>
+          <p style="margin:8px 0 12px; color:var(--muted);">
+            Upload: <span style="font-family:var(--mono)">vaultlite/assets/architecture.png</span><br/>
+            Then replace this box with: <span style="font-family:var(--mono)">&lt;img src="assets/architecture.png"&gt;</span>
+          </p>
+          <!-- Replace the placeholder with your real image -->
+          <!-- <img src="assets/architecture.png" alt="VaultLite architecture diagram" /> -->
+        </div>
+      </div>
+    </section>
+
+    <section id="build" class="section">
+      <h2>Beginner Build Steps</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>0) Cost Safety</h3>
+          <p>Set AWS Budgets alerts ($1/$5/$10). Avoid NAT Gateways and heavy exports early.</p>
+        </div>
+        <div class="card">
+          <h3>1) Setup Tools</h3>
+          <p>AWS CLI + Node.js LTS + CDK (or Terraform). Configure AWS credentials.</p>
+        </div>
+        <div class="card">
+          <h3>2) Data Model</h3>
+          <p>S3 for files. DynamoDB for Documents metadata and AuditEvents (append-only).</p>
+        </div>
+        <div class="card">
+          <h3>3) Cognito Auth</h3>
+          <p>User Pool + App Client + groups for RBAC. API Gateway JWT authorizer.</p>
+        </div>
+        <div class="card">
+          <h3>4) API Layer</h3>
+          <p>API Gateway routes → Lambda handlers. Use pre-signed URLs for upload/download.</p>
+        </div>
+        <div class="card">
+          <h3>5) Workflow</h3>
+          <p>Step Functions orchestrates Draft→Review→Approved/Rejected and writes audit events.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Core Endpoints</h3>
+        <div class="code">POST /docs
+GET  /docs
+GET  /docs/{docId}
+POST /docs/{docId}/upload-url
+POST /docs/{docId}/submit
+POST /docs/{docId}/approve
+POST /docs/{docId}/reject
+GET  /docs/{docId}/download-url</div>
+      </div>
+    </section>
+
+    <section id="security" class="section">
+      <h2>Security & Audit</h2>
+      <div class="card">
+        <ul>
+          <li>S3 Block Public Access + encryption at rest</li>
+          <li>Least privilege IAM roles for Lambda</li>
+          <li>Cognito JWT auth + group-based authorization</li>
+          <li>Append-only AuditEvents in DynamoDB</li>
+          <li>CloudTrail Event History for AWS management visibility</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="evidence" class="section">
+      <h2>Evidence (Screenshots to Add)</h2>
+      <div class="card">
+        <ul>
+          <li>Architecture diagram</li>
+          <li>Postman/Insomnia API test</li>
+          <li>S3 object created after upload</li>
+          <li>DynamoDB Documents item</li>
+          <li>DynamoDB AuditEvents rows</li>
+          <li>Step Functions execution path</li>
+          <li>CloudWatch logs (structured JSON)</li>
+          <li>One “error + fix” (ex: 403 pre-signed URL mismatch)</li>
+        </ul>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div>© 2026 Geeklady55 • VaultLite case study • Hosted on GitHub Pages</div>
+      <div style="margin-top:6px;">
+        Back to main site: <a href="/">geeklady55.github.io</a>
+      </div>
+    </footer>
+  </main>
+</body>
+</html>
+
+
+
+
