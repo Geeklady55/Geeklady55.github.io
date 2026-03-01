@@ -10,6 +10,27 @@
   <meta property="og:title" content="AI Multi-Persona Chatbot Platform | Portfolio" />
   <meta property="og:description" content="JWT Auth • RAG (Embeddings + FAISS) • Streaming (SSE) • FastAPI • Docker • Observability" />
   <meta property="og:type" content="website" />
+  <script>
+  // Guaranteed anchor navigation (fixes cases where CSS/JS interferes)
+  document.addEventListener("DOMContentLoaded", () => {
+    const headerOffset = 110; // adjust if your top nav is taller
+
+    document.querySelectorAll('a[href^="#"]').forEach(link => {
+      link.addEventListener("click", (e) => {
+        const href = link.getAttribute("href");
+        const target = document.querySelector(href);
+        if (!target) return;
+
+        e.preventDefault();
+
+        const y = target.getBoundingClientRect().top + window.pageYOffset - headerOffset;
+        window.scrollTo({ top: y, behavior: "smooth" });
+
+        history.pushState(null, "", href);
+      });
+    });
+  });
+</script>
   <style>
   body {
     margin: 0;
@@ -275,7 +296,7 @@
         <a href="#architecture">Architecture</a>
         <a href="#screenshots">Screenshots</a>
         <a href="#how-to-run">Run</a>
-        <a href="#about">About</a>
+       <a href="#about" id="aboutLink">About</a>
         <a class="btn primary" href="https://github.com/YOUR_GITHUB_USERNAME/ai-multi-persona-chatbot-platform" target="_blank" rel="noopener">
           View on GitHub →
         </a>
@@ -651,6 +672,7 @@ My goal was simple: build something that reflects how I think — secure, scalab
   </script>
 </body>
 </html>
+
 
 
 
