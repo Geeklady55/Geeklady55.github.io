@@ -277,6 +277,36 @@
     .row{display:flex;gap:10px;flex-wrap:wrap}
     .spacer{height:10px}
   </style>
+  <style>
+  /* ---------- Slim look reset ---------- */
+  :root { --max: 1050px; }
+
+  body { line-height: 1.45; }
+  .section { padding: 56px 20px !important; }
+  .container, .wrap, .content { max-width: var(--max); margin: 0 auto; }
+
+  h1 { font-size: clamp(32px, 4vw, 44px) !important; margin: 0 0 10px !important; }
+  h2 { font-size: 24px !important; margin: 0 0 10px !important; }
+  h3 { font-size: 18px !important; margin: 10px 0 8px !important; }
+  p  { margin: 10px 0 !important; }
+
+  /* If you have a hero, make it slimmer */
+  .hero { padding: 90px 20px 40px !important; }
+
+  /* Images: stop them from being huge */
+  .shot img, section img {
+    width: 100%;
+    max-width: 980px;
+    height: auto;
+    display: block;
+    margin: 12px auto;
+    border-radius: 12px;
+  }
+
+  /* Make cards/grids not too tall */
+  .grid { gap: 14px !important; }
+  .card { padding: 14px !important; }
+</style>
 </head>
 <body>
   <div> class="wrap"></div>
@@ -523,34 +553,47 @@
     </section>
     <!--DIAGRAMS -->
     
-<section id="diagram" class="section">
+<section id="diagrams" class="section">
   <h2>Diagrams</h2>
-  <p>System architecture and workflow design for AI platform integration.</p>
+  <p class="lead">Architecture and workflow visuals for the platform.</p>
 
-  <div>
-    <h3>API Interaction Sequence</h3>
-    <img src="screenshots/diagram/APIInteractionSequence.png" alt="API Interaction Sequence Diagram">
-  </div>
+  <div class="grid twoCol">
+    <div class="card">
+      <div class="cardIn">
+        <div class="cardTitle">API Interaction Sequence</div>
+        <div class="shot">
+          <img src="screenshots/diagrams/APIInteractionSequence.png" alt="API Interaction Sequence Diagram">
+        </div>
+      </div>
+    </div>
 
-  <div>
-    <h3>ComfyUI Flow Design</h3>
-    <img src="screenshots/diagram/ComfyUI-flow-design.png" alt="ComfyUI Flow Design Diagram">
-  </div>
+    <div class="card">
+      <div class="cardIn">
+        <div class="cardTitle">ComfyUI Flow Design</div>
+        <div class="shot">
+          <img src="screenshots/diagrams/ComfyUI-flow-design.png" alt="ComfyUI Flow Design Diagram">
+        </div>
+      </div>
+    </div>
 
-  <div>
-    <h3>Additional Diagram (Coming Soon)</h3>
-    <div style="height:300px; border:2px dashed #7c5cff; display:flex; align-items:center; justify-content:center; color:#7c5cff;">
-      Diagram placeholder
+    <div class="card">
+      <div class="cardIn">
+        <div class="cardTitle">Coming Soon</div>
+        <div class="shot" style="min-height:160px; border:1px dashed rgba(255,255,255,.25); display:flex; align-items:center; justify-content:center;">
+          Placeholder
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="cardIn">
+        <div class="cardTitle">Coming Soon</div>
+        <div class="shot" style="min-height:160px; border:1px dashed rgba(255,255,255,.25); display:flex; align-items:center; justify-content:center;">
+          Placeholder
+        </div>
+      </div>
     </div>
   </div>
-
-  <div>
-    <h3>Additional Diagram (Coming Soon)</h3>
-    <div style="height:300px; border:2px dashed #7c5cff; display:flex; align-items:center; justify-content:center; color:#7c5cff;">
-      Diagram placeholder
-    </div>
-  </div>
-
 </section>
     <!-- SCREENSHOTS -->
       <section id="screenshots" class="section">
@@ -740,6 +783,7 @@ My goal was simple: build something that reflects how I think — secure, scalab
 </section>
 </body>
 </html>
+
 
 
 
