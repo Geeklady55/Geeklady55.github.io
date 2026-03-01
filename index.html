@@ -11,6 +11,95 @@
   <meta property="og:description" content="JWT Auth • RAG (Embeddings + FAISS) • Streaming (SSE) • FastAPI • Docker • Observability" />
   <meta property="og:type" content="website" />
   <style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #0f172a;
+    color: white;
+  }
+
+  nav {
+    position: sticky;
+    top: 0;
+    background: #0f172a;
+    padding: 15px 40px;
+    display: flex;
+    gap: 20px;
+    z-index: 1000;
+  }
+
+  nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+  }
+
+  nav a:hover {
+    color: #7c5cff;
+  }
+
+  section {
+    padding: 80px 40px;
+    scroll-margin-top: 100px;
+  }
+
+  .hero {
+    text-align: center;
+    padding: 120px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  h1 {
+    font-size: 48px;
+    margin-bottom: 20px;
+  }
+
+  p {
+    font-size: 18px;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .orb {
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.4;
+    animation: float 10s ease-in-out infinite;
+  }
+
+  .orb.one {
+    background: #7c5cff;
+    top: -100px;
+    left: -100px;
+  }
+
+  .orb.two {
+    background: #35d3ff;
+    bottom: -120px;
+    right: -100px;
+  }
+
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(30px); }
+    100% { transform: translateY(0px); }
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  img {
+    max-width: 100%;
+    border-radius: 12px;
+    margin-top: 20px;
+  }
+</style>
+  <style>
     :root{
       --bg:#0b1020;
       --card:#121a33;
@@ -550,6 +639,7 @@
   </script>
 </body>
 </html>
+
 
 
 
