@@ -203,23 +203,31 @@
     </section>
 
     <section id="architecture" class="section">
-      <h2>Architecture</h2>
-      <div class="twoCol">
-        <div class="card">
-          <h3>High-Level Flow</h3>
-          <div class="code">User → Cognito (JWT)
+     <h2>Architecture</h2>
+
+<div class="twoCol">
+  <div class="card">
+    <h3>High-Level Flow</h3>
+    <div class="code">
+User → Cognito (JWT)
 User → API Gateway → Lambda
 Lambda → DynamoDB (Documents, AuditEvents)
 Lambda → S3 (pre-signed upload/download URLs)
 Workflow actions → Step Functions → status updates + audit events
 Logs → CloudWatch
-AWS account activity → CloudTrail Event History</div>
-        </div>
-  
-  <h2>Test Images</h2>
-  <img src="architecture.png" width="100%">
-  <img src="logs.png" width="100%">
-  <img src="dynamodb.png" width="100%">
+AWS account activity → CloudTrail Event History
+    </div>
+  </div>
+</div>  <!-- CLOSE twoCol -->
+
+<!-- NOW OUTSIDE GRID STRUCTURE -->
+
+<h2>Test Images</h2>
+
+<img src="architecture.png" width="100%">
+<img src="logs.png" width="100%">
+<img src="dynamodb.png" width="100%">
+
 </section>
       </div>
     </div>
