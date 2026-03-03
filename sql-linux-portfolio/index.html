@@ -4,14 +4,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>SQL + Linux Portfolio | Geeklady55</title>
-  <meta name="description" content="Advanced SQL queries and Linux projects with step-by-step case studies (GitHub Pages)." />
-  <link rel="stylesheet" href="assets/css/styles.css" />
+  <title>SQL Case Study: Net Revenue Retention (NRR) Ranking | SQL + Linux Portfolio</title>
+  <meta name="description" content="Interview-grade SQL: cohort-style month-over-month NRR, churn/expansion/contraction detection, ranking, and validation." />
+  <link rel="stylesheet" href="../../../assets/css/styles.css" />
 </head>
 <body>
   <div class="topbar">
     <div class="nav">
-      <a class="brand" href="./">
+      <a class="brand" href="../../../">
         <span class="logo" aria-hidden="true"></span>
         <div>
           <h1>SQL + Linux Portfolio</h1>
@@ -19,107 +19,244 @@
         </div>
       </a>
       <div class="navlinks">
-        <a class="pill active" href="./">Home</a>
-        <a class="pill" href="sql.html">SQL</a>
-        <a class="pill" href="linux.html">Linux</a>
-        <a class="pill" href="about.html">About</a>
+        <a class="pill" href="../../../">Home</a>
+        <a class="pill active" href="../../../sql.html">SQL</a>
+        <a class="pill" href="../../../linux.html">Linux</a>
+        <a class="pill" href="../../../about.html">About</a>
         <a class="pill" href="https://github.com/Geeklady55" target="_blank" rel="noreferrer">GitHub</a>
       </div>
     </div>
   </div>
 
   <main class="container">
-    <section class="hero">
-      <div class="card">
-        <span class="kicker"><span class="dot" aria-hidden="true"></span> Portfolio built on GitHub Pages</span>
-        <h2 class="h1">Real-world SQL + Linux work, documented like a systems admin.</h2>
-        <p class="sub">
-          This site showcases <strong>advanced SQL</strong> (CTEs, window functions, performance tuning) and
-          <strong>Linux projects</strong> (triage, automation, systemd, hardening) with full step-by-step case studies,
-          command outputs, and artifacts.
-        </p>
+    <div class="card">
+      <div class="breadcrumb">
+        <a href="../../../">Home</a><span>›</span>
+        <a href="../../../sql.html">SQL</a><span>›</span>
+        <span>NRR Ranking</span>
+      </div>
 
-        <div class="ctaRow">
-          <a class="btn primary" href="sql.html">Browse SQL Projects</a>
-          <a class="btn primary" href="linux.html">Browse Linux Projects</a>
-          <a class="btn" href="about.html">About / Contact</a>
+      <h2 class="h1" style="margin-top:10px;">SQL Case Study: True Top Customers by Net Revenue Retention (NRR)</h2>
+      <p class="sub">
+        This case study demonstrates a real-world, SaaS-style retention metric:
+        month-over-month revenue retention per customer, with churn/expansion/contraction classification and ranking.
+        I wrote this the same way I would for production support: correct math, edge-case handling, and validation.
+      </p>
+
+      <div class="ctaRow">
+        <a class="btn primary" href="./queries.sql" download>Download queries.sql</a>
+        <a class="btn" href="./schema.sql" download>Download schema.sql</a>
+        <a class="btn" href="./validation.sql" download>Download validation.sql</a>
+        <a class="btn" href="../../../sql.html">Back to SQL</a>
+      </div>
+
+      <hr class="sep" />
+
+      <h3 class="sectionTitle">1) Use Case</h3>
+      <p class="sub">
+        The business question isn’t “top customers by revenue.” It’s “top customers by <strong>revenue retention</strong>.”
+        This catches:
+        churn (lost revenue), expansion (upsells), contraction (downgrades), and new starts.
+        The output is interview-grade but also production-friendly: it’s traceable, explainable, and testable.
+      </p>
+
+      <h3 class="sectionTitle">2) Realistic Schema</h3>
+      <p class="sub">
+        This version uses a minimal invoice fact table, but it maps cleanly to SaaS billing systems (Stripe-like invoices, ERP invoice lines, etc.).
+        If you have invoice lines, you’d aggregate line totals into invoices first.
+      </p>
+
+      <div class="code">
+        <pre><code>-- PostgreSQL-style DDL (adaptable)
+CREATE TABLE invoices (
+  invoice_id      bigserial PRIMARY KEY,
+  customer_id     bigint NOT NULL,
+  invoice_date    date   NOT NULL,
+  amount          numeric(12,2) NOT NULL,
+  currency        text DEFAULT 'USD',
+  status          text DEFAULT 'paid'
+);
+
+-- Helpful indexes for scale:
+CREATE INDEX IF NOT EXISTS idx_invoices_customer_date ON invoices(customer_id, invoice_date);
+CREATE INDEX IF NOT EXISTS idx_invoices_date ON invoices(invoice_date);
+
+-- Optional: if you filter paid-only:
+-- CREATE INDEX idx_invoices_status_date ON invoices(status, invoice_date);</code></pre>
+      </div>
+
+      <h3 class="sectionTitle">3) Approach</h3>
+      <div class="grid">
+        <div class="tile">
+          <h3>Step A: Monthly revenue</h3>
+          <p>Bucket invoices by month and aggregate MRR-like totals per customer.</p>
+          <div class="meta"><span class="tag">DATE_TRUNC</span><span class="tag">GROUP BY</span></div>
         </div>
+        <div class="tile">
+          <h3>Step B: Previous month</h3>
+          <p>Use window functions to retrieve prior month revenue per customer.</p>
+          <div class="meta"><span class="tag">LAG</span><span class="tag">PARTITION</span></div>
+        </div>
+        <div class="tile">
+          <h3>Step C: NRR + movement</h3>
+          <p>Compute ratio + delta, and label churn/new/expansion/contraction.</p>
+          <div class="meta"><span class="tag">CASE</span><span class="tag">Edge Cases</span></div>
+        </div>
+      </div>
 
-        <hr class="sep" />
+      <h3 class="sectionTitle">4) Final Query</h3>
+      <p class="sub">
+        Key details: correct temporal aggregation, LAG for prev month, ratio math with NULL/0 protection,
+        movement classification, and ranking that prefers retention first, then revenue impact.
+      </p>
 
-        <div class="grid">
-          <div class="tile">
-            <h3>SQL: Performance + Proof</h3>
-            <p>Queries include problem statement, schema notes, validation strategy, and EXPLAIN plan comparisons.</p>
-            <div class="meta">
-              <span class="tag">CTEs</span><span class="tag">Window Functions</span><span class="tag">Indexes</span>
-            </div>
+      <div class="code">
+        <pre><code>WITH monthly_rev AS (
+  SELECT
+    customer_id,
+    DATE_TRUNC('month', invoice_date) AS month,
+    SUM(amount) AS mrr
+  FROM invoices
+  -- WHERE status = 'paid'  -- enable if you store non-paid invoices
+  GROUP BY 1, 2
+),
+with_prev AS (
+  SELECT
+    customer_id,
+    month,
+    mrr,
+    LAG(mrr) OVER (PARTITION BY customer_id ORDER BY month) AS prev_mrr
+  FROM monthly_rev
+),
+nrr AS (
+  SELECT
+    customer_id,
+    month,
+    prev_mrr,
+    mrr,
+    CASE
+      WHEN prev_mrr IS NULL OR prev_mrr = 0 THEN NULL
+      ELSE ROUND((mrr / prev_mrr)::numeric, 4)
+    END AS nrr_ratio,
+    (mrr - COALESCE(prev_mrr, 0)) AS delta_mrr,
+    CASE
+      WHEN prev_mrr &gt; 0 AND mrr = 0 THEN 'churn'
+      WHEN prev_mrr = 0 AND mrr &gt; 0 THEN 'new'
+      WHEN mrr &gt; prev_mrr THEN 'expansion'
+      WHEN mrr &lt; prev_mrr THEN 'contraction'
+      ELSE 'flat'
+    END AS movement_type
+  FROM with_prev
+)
+SELECT
+  customer_id,
+  month,
+  prev_mrr,
+  mrr,
+  nrr_ratio,
+  delta_mrr,
+  movement_type,
+  DENSE_RANK() OVER (
+    ORDER BY nrr_ratio DESC NULLS LAST, delta_mrr DESC
+  ) AS nrr_rank
+FROM nrr
+WHERE prev_mrr IS NOT NULL
+ORDER BY nrr_rank, month DESC;</code></pre>
+      </div>
+
+      <h3 class="sectionTitle">5) Production Notes</h3>
+      <div class="grid">
+        <div class="tile">
+          <h3>Data correctness</h3>
+          <p>NRR is computed only when prev_mrr is non-zero; new-start months get NULL ratio by design.</p>
+        </div>
+        <div class="tile">
+          <h3>Time zones</h3>
+          <p>In production, normalize invoice_date to UTC-based business day rules before monthly bucketing if needed.</p>
+        </div>
+        <div class="tile">
+          <h3>Scale</h3>
+          <p>Indexes on (customer_id, invoice_date) keep monthly aggregation fast; consider partitioning by date for very large tables.</p>
+        </div>
+      </div>
+
+      <h3 class="sectionTitle">6) Validation Steps</h3>
+      <p class="sub">
+        This is how I validate before trusting retention results:
+        compare monthly totals, compare customer-month row counts, spot-check edge cases (new, churn, expansion),
+        and validate that month bucketing does not drop invoices.
+      </p>
+
+      <div class="code">
+        <pre><code>-- A) Monthly totals should match source totals
+WITH src AS (
+  SELECT DATE_TRUNC('month', invoice_date) AS month, SUM(amount) AS src_total
+  FROM invoices
+  GROUP BY 1
+),
+agg AS (
+  SELECT month, SUM(mrr) AS agg_total
+  FROM (
+    SELECT customer_id, DATE_TRUNC('month', invoice_date) AS month, SUM(amount) AS mrr
+    FROM invoices
+    GROUP BY 1,2
+  ) x
+  GROUP BY 1
+)
+SELECT s.month, s.src_total, a.agg_total, (s.src_total - a.agg_total) AS diff
+FROM src s
+JOIN agg a USING (month)
+ORDER BY s.month;
+
+-- B) Movement classification sanity checks
+-- churn: prev_mrr > 0 and mrr = 0
+-- new:   prev_mrr = 0 and mrr > 0 (or prev missing if you materialize 0 months)
+-- expansion/contraction: compare mrr vs prev_mrr
+
+-- C) Spot-check a single customer across months
+SELECT *
+FROM (
+  -- paste final SELECT here (or reference a view)
+) n
+WHERE customer_id = :customer_id
+ORDER BY month;</code></pre>
+      </div>
+
+      <h3 class="sectionTitle">7) Evidence to Add (Recommended)</h3>
+      <div class="list">
+        <div class="item">
+          <div class="left">
+            <h3>EXPLAIN / EXPLAIN ANALYZE output</h3>
+            <p>Add <code>explain-before.txt</code> and <code>explain-after.txt</code> if you tune indexes or partitioning.</p>
           </div>
-          <div class="tile">
-            <h3>Linux: Triage + Automation</h3>
-            <p>Projects show commands + outputs, scripts, runbooks, and “what broke / how I fixed it” sections.</p>
-            <div class="meta">
-              <span class="tag">journalctl</span><span class="tag">systemd</span><span class="tag">Bash</span>
-            </div>
+          <div class="right">
+            <span class="small">Place in this folder</span>
           </div>
-          <div class="tile">
-            <h3>Hiring-team Friendly</h3>
-            <p>Clean navigation, short sections, and downloadable artifacts so reviewers can verify quickly.</p>
-            <div class="meta">
-              <span class="tag">Case Studies</span><span class="tag">Artifacts</span><span class="tag">RCA</span>
-            </div>
+        </div>
+        <div class="item">
+          <div class="left">
+            <h3>Test dataset</h3>
+            <p>Add a small <code>seed.sql</code> with 3–5 customers showing churn/expansion/contraction to prove logic.</p>
+          </div>
+          <div class="right">
+            <span class="small">Repeatable demo</span>
+          </div>
+        </div>
+        <div class="item">
+          <div class="left">
+            <h3>Results snapshot</h3>
+            <p>Export <code>results.csv</code> for a fixed month range and link it for reviewers.</p>
+          </div>
+          <div class="right">
+            <span class="small">Fast review</span>
           </div>
         </div>
       </div>
 
-      <aside class="card">
-        <h3 class="sectionTitle">Quick Links</h3>
-        <div class="list">
-          <div class="item">
-            <div class="left">
-              <h3>SQL Index</h3>
-              <p>Advanced query packs, tuning notes, validation checks.</p>
-            </div>
-            <div class="right">
-              <a class="link" href="sql.html">Open</a>
-            </div>
-          </div>
-          <div class="item">
-            <div class="left">
-              <h3>Linux Index</h3>
-              <p>Triage toolkits, automation scripts, system troubleshooting.</p>
-            </div>
-            <div class="right">
-              <a class="link" href="linux.html">Open</a>
-            </div>
-          </div>
-          <div class="item">
-            <div class="left">
-              <h3>Source Repo</h3>
-              <p>Full code + artifacts hosted on GitHub.</p>
-            </div>
-            <div class="right">
-              <a class="link" href="https://github.com/Geeklady55/Geeklady55.github.io" target="_blank" rel="noreferrer">View Repo</a>
-            </div>
-          </div>
-        </div>
-
-        <hr class="sep" />
-
-        <p class="small">
-          Tip: For each project, add <strong>downloadable files</strong> (queries.sql, scripts, logs) and
-          <strong>screenshots</strong> in the project folder. Keep filenames lowercase to avoid 404s.
-        </p>
-      </aside>
-    </section>
-
-    <footer class="footer">
-      <div>© <span id="y"></span> Geeklady55 • Built with HTML/CSS • Hosted on GitHub Pages</div>
-    </footer>
+      <footer class="footer">
+        <div><strong>Why this matters:</strong> This query shows I can build metrics correctly, handle edge cases, and validate outputs like production work.</div>
+      </footer>
+    </div>
   </main>
-
-  <script>
-    document.getElementById("y").textContent = new Date().getFullYear();
-  </script>
 </body>
 </html>
