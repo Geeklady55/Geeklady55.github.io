@@ -1,1 +1,116 @@
 
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Linux Projects | SQL + Linux Portfolio</title>
+  <meta name="description" content="Linux projects: triage, automation, systemd, hardening, and troubleshooting case studies." />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+  <div class="topbar">
+    <div class="nav">
+      <a class="brand" href="./">
+        <span class="logo" aria-hidden="true"></span>
+        <div>
+          <h1>SQL + Linux Portfolio</h1>
+          <span class="mini">Advanced queries • SysAdmin projects • Step-by-step case studies</span>
+        </div>
+      </a>
+      <div class="navlinks">
+        <a class="pill" href="./">Home</a>
+        <a class="pill" href="sql.html">SQL</a>
+        <a class="pill active" href="linux.html">Linux</a>
+        <a class="pill" href="about.html">About</a>
+        <a class="pill" href="https://github.com/Geeklady55" target="_blank" rel="noreferrer">GitHub</a>
+      </div>
+    </div>
+  </div>
+
+  <main class="container">
+    <div class="card">
+      <div class="breadcrumb">
+        <a href="./">Home</a><span>›</span><span>Linux</span>
+      </div>
+
+      <h2 class="h1" style="margin-top:10px;">Linux / SysAdmin Projects</h2>
+      <p class="sub">
+        Projects are documented like real incident work: commands + outputs, scripts/configs, and RCA (“what broke and how I fixed it”).
+        Add scripts under each project folder for easy review and downloads.
+      </p>
+
+      <h3 class="sectionTitle">Projects</h3>
+      <div class="list">
+        <div class="item">
+          <div class="left">
+            <h3>Log Triage Toolkit</h3>
+            <p>
+              A repeatable process for isolating root causes using journalctl, grep pipelines, and structured notes.
+              Includes a starter triage script and an example workflow.
+            </p>
+            <div class="meta" style="margin-top:10px;">
+              <span class="tag">journalctl</span><span class="tag">Bash</span><span class="tag">RCA</span><span class="tag">Runbook</span>
+            </div>
+          </div>
+          <div class="right">
+            <a class="link" href="projects/linux/log-triage-toolkit/">Open Case Study</a>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="left">
+            <h3>Coming Soon: systemd Service Debugging</h3>
+            <p>
+              Build a service unit, debug failures, document fixes, and validate the solution with logs and exit codes.
+            </p>
+            <div class="meta" style="margin-top:10px;">
+              <span class="tag">systemd</span><span class="tag">ExecStart</span><span class="tag">Permissions</span>
+            </div>
+          </div>
+          <div class="right">
+            <span class="small">Add under: <code>projects/linux/systemd-debugging/</code></span>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="left">
+            <h3>Coming Soon: Hardening Baseline</h3>
+            <p>
+              SSH hardening, firewall rules, fail2ban, least privilege, and validation checks with before/after evidence.
+            </p>
+            <div class="meta" style="margin-top:10px;">
+              <span class="tag">sshd</span><span class="tag">firewalld</span><span class="tag">fail2ban</span>
+            </div>
+          </div>
+          <div class="right">
+            <span class="small">Add under: <code>projects/linux/hardening-baseline/</code></span>
+          </div>
+        </div>
+      </div>
+
+      <hr class="sep" />
+
+      <h3 class="sectionTitle">Recommended Artifacts to Add</h3>
+      <div class="grid">
+        <div class="tile">
+          <h3>commands.md</h3>
+          <p>Command history + outputs. Keep it clean and labeled by step and purpose.</p>
+        </div>
+        <div class="tile">
+          <h3>scripts/</h3>
+          <p>Store Bash/Python scripts with comments and safe defaults (read-only mode when possible).</p>
+        </div>
+        <div class="tile">
+          <h3>errors + fixes</h3>
+          <p>Include common errors you hit and the verified fixes. Hiring teams love real troubleshooting.</p>
+        </div>
+      </div>
+
+      <footer class="footer">
+        <div>Tip: Put screenshots inside each project folder and reference them with <code>./image.png</code> to avoid broken paths.</div>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>
