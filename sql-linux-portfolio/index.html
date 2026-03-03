@@ -1,1 +1,125 @@
 
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SQL + Linux Portfolio | Geeklady55</title>
+  <meta name="description" content="Advanced SQL queries and Linux projects with step-by-step case studies (GitHub Pages)." />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+  <div class="topbar">
+    <div class="nav">
+      <a class="brand" href="./">
+        <span class="logo" aria-hidden="true"></span>
+        <div>
+          <h1>SQL + Linux Portfolio</h1>
+          <span class="mini">Advanced queries • SysAdmin projects • Step-by-step case studies</span>
+        </div>
+      </a>
+      <div class="navlinks">
+        <a class="pill active" href="./">Home</a>
+        <a class="pill" href="sql.html">SQL</a>
+        <a class="pill" href="linux.html">Linux</a>
+        <a class="pill" href="about.html">About</a>
+        <a class="pill" href="https://github.com/Geeklady55" target="_blank" rel="noreferrer">GitHub</a>
+      </div>
+    </div>
+  </div>
+
+  <main class="container">
+    <section class="hero">
+      <div class="card">
+        <span class="kicker"><span class="dot" aria-hidden="true"></span> Portfolio built on GitHub Pages</span>
+        <h2 class="h1">Real-world SQL + Linux work, documented like a systems admin.</h2>
+        <p class="sub">
+          This site showcases <strong>advanced SQL</strong> (CTEs, window functions, performance tuning) and
+          <strong>Linux projects</strong> (triage, automation, systemd, hardening) with full step-by-step case studies,
+          command outputs, and artifacts.
+        </p>
+
+        <div class="ctaRow">
+          <a class="btn primary" href="sql.html">Browse SQL Projects</a>
+          <a class="btn primary" href="linux.html">Browse Linux Projects</a>
+          <a class="btn" href="about.html">About / Contact</a>
+        </div>
+
+        <hr class="sep" />
+
+        <div class="grid">
+          <div class="tile">
+            <h3>SQL: Performance + Proof</h3>
+            <p>Queries include problem statement, schema notes, validation strategy, and EXPLAIN plan comparisons.</p>
+            <div class="meta">
+              <span class="tag">CTEs</span><span class="tag">Window Functions</span><span class="tag">Indexes</span>
+            </div>
+          </div>
+          <div class="tile">
+            <h3>Linux: Triage + Automation</h3>
+            <p>Projects show commands + outputs, scripts, runbooks, and “what broke / how I fixed it” sections.</p>
+            <div class="meta">
+              <span class="tag">journalctl</span><span class="tag">systemd</span><span class="tag">Bash</span>
+            </div>
+          </div>
+          <div class="tile">
+            <h3>Hiring-team Friendly</h3>
+            <p>Clean navigation, short sections, and downloadable artifacts so reviewers can verify quickly.</p>
+            <div class="meta">
+              <span class="tag">Case Studies</span><span class="tag">Artifacts</span><span class="tag">RCA</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="card">
+        <h3 class="sectionTitle">Quick Links</h3>
+        <div class="list">
+          <div class="item">
+            <div class="left">
+              <h3>SQL Index</h3>
+              <p>Advanced query packs, tuning notes, validation checks.</p>
+            </div>
+            <div class="right">
+              <a class="link" href="sql.html">Open</a>
+            </div>
+          </div>
+          <div class="item">
+            <div class="left">
+              <h3>Linux Index</h3>
+              <p>Triage toolkits, automation scripts, system troubleshooting.</p>
+            </div>
+            <div class="right">
+              <a class="link" href="linux.html">Open</a>
+            </div>
+          </div>
+          <div class="item">
+            <div class="left">
+              <h3>Source Repo</h3>
+              <p>Full code + artifacts hosted on GitHub.</p>
+            </div>
+            <div class="right">
+              <a class="link" href="https://github.com/Geeklady55/Geeklady55.github.io" target="_blank" rel="noreferrer">View Repo</a>
+            </div>
+          </div>
+        </div>
+
+        <hr class="sep" />
+
+        <p class="small">
+          Tip: For each project, add <strong>downloadable files</strong> (queries.sql, scripts, logs) and
+          <strong>screenshots</strong> in the project folder. Keep filenames lowercase to avoid 404s.
+        </p>
+      </aside>
+    </section>
+
+    <footer class="footer">
+      <div>© <span id="y"></span> Geeklady55 • Built with HTML/CSS • Hosted on GitHub Pages</div>
+    </footer>
+  </main>
+
+  <script>
+    document.getElementById("y").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
