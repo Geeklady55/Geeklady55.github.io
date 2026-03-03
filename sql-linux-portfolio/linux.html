@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>SQL Case Study: Performance Tuning | SQL + Linux Portfolio</title>
-  <meta name="description" content="SQL performance tuning case study: validate, optimize, and prove improvement." />
+  <title>Linux Case Study: Log Triage Toolkit | SQL + Linux Portfolio</title>
+  <meta name="description" content="Linux log triage toolkit: repeatable steps, commands, and scripts for root cause analysis." />
   <link rel="stylesheet" href="../../../assets/css/styles.css" />
 </head>
 <body>
@@ -19,8 +19,8 @@
       </a>
       <div class="navlinks">
         <a class="pill" href="../../../">Home</a>
-        <a class="pill active" href="../../../sql.html">SQL</a>
-        <a class="pill" href="../../../linux.html">Linux</a>
+        <a class="pill" href="../../../sql.html">SQL</a>
+        <a class="pill active" href="../../../linux.html">Linux</a>
         <a class="pill" href="../../../about.html">About</a>
         <a class="pill" href="https://github.com/Geeklady55" target="_blank" rel="noreferrer">GitHub</a>
       </div>
@@ -31,138 +31,132 @@
     <div class="card">
       <div class="breadcrumb">
         <a href="../../../">Home</a><span>›</span>
-        <a href="../../../sql.html">SQL</a><span>›</span>
-        <span>Performance Tuning</span>
+        <a href="../../../linux.html">Linux</a><span>›</span>
+        <span>Log Triage Toolkit</span>
       </div>
 
-      <h2 class="h1" style="margin-top:10px;">SQL Case Study: Performance Tuning</h2>
+      <h2 class="h1" style="margin-top:10px;">Linux Case Study: Log Triage Toolkit</h2>
       <p class="sub">
-        Template case study. Replace the placeholders with your real schema, EXPLAIN output, timings, and evidence screenshots.
-        Keep artifacts in this folder so links remain stable.
+        A repeatable incident workflow for quickly narrowing down the root cause using journald, service status,
+        and targeted filtering. Replace sample outputs with real screenshots and logs as you build.
       </p>
 
       <div class="ctaRow">
-        <a class="btn primary" href="./queries.sql" download>Download queries.sql</a>
-        <a class="btn" href="./explain-plan.md" download>Download explain-plan.md</a>
-        <a class="btn" href="../../../sql.html">Back to SQL</a>
+        <a class="btn primary" href="./commands.md" download>Download commands.md</a>
+        <a class="btn" href="./scripts/triage.sh" download>Download triage.sh</a>
+        <a class="btn" href="../../../linux.html">Back to Linux</a>
       </div>
 
       <hr class="sep" />
 
-      <h3 class="sectionTitle">1) Problem</h3>
+      <h3 class="sectionTitle">1) Goal</h3>
       <p class="sub">
-        The reporting query was timing out under load / scanning too many rows. Goal: reduce runtime and improve predictability
-        without changing the business result.
+        Provide a consistent playbook for investigating service failures (timeouts, restarts, 5xx errors), capturing evidence,
+        and producing a short RCA summary.
       </p>
 
-      <h3 class="sectionTitle">2) Context / Tables</h3>
-      <p class="sub">
-        Replace with your real table names and key columns. Keep it short and focused on join keys and filters.
-      </p>
+      <h3 class="sectionTitle">2) Environment</h3>
       <div class="code">
-        <pre><code>-- Example (replace with your schema notes)
-orders(order_id, customer_id, order_ts, status, total)
-customers(customer_id, email, created_ts, region)
-order_items(order_id, sku, qty, price)
-
--- Common filters:
--- orders.status in ('PAID','SHIPPED')
--- orders.order_ts between :start and :end</code></pre>
+        <pre><code>OS: Ubuntu / RHEL (document your version)
+Logging: journald + /var/log/*
+Tools: journalctl, systemctl, ss, ip, df, free, top, grep, awk</code></pre>
       </div>
 
-      <h3 class="sectionTitle">3) Baseline (Before)</h3>
-      <p class="sub">
-        Capture measurable evidence: execution time, rows scanned, and the EXPLAIN plan output.
-      </p>
-      <div class="code">
-        <pre><code>-- BEFORE (sample)
-WITH base AS (
-  SELECT o.customer_id, o.order_id, o.total, o.order_ts
-  FROM orders o
-  WHERE o.status IN ('PAID','SHIPPED')
-    AND o.order_ts &gt;= :start
-    AND o.order_ts &lt;  :end
-)
-SELECT customer_id,
-       COUNT(*) AS orders,
-       SUM(total) AS revenue
-FROM base
-GROUP BY customer_id
-ORDER BY revenue DESC
-LIMIT 50;</code></pre>
-      </div>
-      <p class="small">
-        Add: before-plan screenshot (e.g. <code>./explain-before.png</code>) and timing evidence (CloudWatch, AWR, pg_stat_statements, etc.).
-      </p>
+      <h3 class="sectionTitle">3) Step-by-step Workflow</h3>
 
-      <h3 class="sectionTitle">4) Diagnosis</h3>
       <div class="grid">
         <div class="tile">
-          <h3>Observed</h3>
-          <p>Full table scans, heavy sort, or poor join order causing high IO / latency spikes.</p>
+          <h3>Step A: Confirm service state</h3>
+          <p>Identify the failing unit and the last restart reason.</p>
         </div>
         <div class="tile">
-          <h3>Tools</h3>
-          <p>EXPLAIN / EXPLAIN ANALYZE, query stats, and row estimates vs actual.</p>
+          <h3>Step B: Pull focused logs</h3>
+          <p>Filter by unit and timeframe to reduce noise.</p>
         </div>
         <div class="tile">
-          <h3>Hypothesis</h3>
-          <p>Improve selectivity by indexing filter columns + reduce sort/aggregation cost.</p>
+          <h3>Step C: Validate system health</h3>
+          <p>Check CPU/mem/disk, network sockets, DNS, and dependencies.</p>
         </div>
       </div>
 
-      <h3 class="sectionTitle">5) Optimization (After)</h3>
-      <p class="sub">
-        Document what changed and why: indexes, query rewrite, predicate pushdown, reduced data movement.
-      </p>
-      <div class="code">
-        <pre><code>-- AFTER (sample improvements)
--- Index ideas (adapt to your DB engine):
--- CREATE INDEX idx_orders_status_ts ON orders(status, order_ts);
--- CREATE INDEX idx_orders_customer_ts ON orders(customer_id, order_ts);
+      <div class="code" style="margin-top:12px;">
+        <pre><code># Step A: Service health
+systemctl status myservice --no-pager
+systemctl is-failed myservice
+systemctl show -p ActiveEnterTimestamp myservice
 
-SELECT o.customer_id,
-       COUNT(*) AS orders,
-       SUM(o.total) AS revenue
-FROM orders o
-WHERE o.status IN ('PAID','SHIPPED')
-  AND o.order_ts &gt;= :start
-  AND o.order_ts &lt;  :end
-GROUP BY o.customer_id
-ORDER BY revenue DESC
-LIMIT 50;</code></pre>
+# Step B: Logs (last 2 hours)
+journalctl -u myservice --since "2 hours ago" --no-pager
+journalctl -u myservice -p warning --since "2 hours ago" --no-pager
+
+# Step C: Quick system checks
+df -h
+free -m
+uptime
+ss -tulpn | head
+ip a
+resolvectl status 2>/dev/null || cat /etc/resolv.conf</code></pre>
       </div>
 
-      <h3 class="sectionTitle">6) Validation Strategy</h3>
+      <h3 class="sectionTitle">4) Scripted Triage (optional)</h3>
       <p class="sub">
-        Show how you confirmed the optimized query returns the same results before making changes in production.
+        Include a script to standardize evidence capture. Keep it safe by default (read-only) and clearly label outputs.
       </p>
       <div class="code">
-        <pre><code>-- Example validation approach:
--- 1) Run before + after for a fixed date range
--- 2) Compare aggregate checksums / row counts
+        <pre><code># Example usage (your script can implement this):
+bash ./scripts/triage.sh myservice 2h
 
--- Row-count compare (example)
--- SELECT COUNT(*) FROM (before_query) b;
--- SELECT COUNT(*) FROM (after_query)  a;
-
--- Revenue compare (example)
--- SELECT SUM(revenue) FROM (before_query) b;
--- SELECT SUM(revenue) FROM (after_query)  a;</code></pre>
+# Recommended output files:
+# triage_myservice_YYYYMMDD_HHMM/
+#   systemctl_status.txt
+#   journalctl_last2h.txt
+#   sockets.txt
+#   disk.txt
+#   mem.txt</code></pre>
       </div>
 
-      <h3 class="sectionTitle">7) Results</h3>
+      <h3 class="sectionTitle">5) What Broke + Fix</h3>
       <p class="sub">
-        Replace with real metrics (example format): runtime reduced from <strong>12.4s → 1.9s</strong>, rows scanned reduced by <strong>85%</strong>.
+        Add a real example here. Format:
       </p>
+      <div class="code">
+        <pre><code>Symptom:
+- service restarting every 30s
+- upstream returning 502
 
-      <h3 class="sectionTitle">8) What I’d Improve Next</h3>
-      <p class="sub">
-        Examples: partitioning by date, materialized views, caching strategy, further index tuning, query plan regression tests.
-      </p>
+Root Cause:
+- config typo in /etc/myservice/config.yml
+- missing env var after deploy
+
+Fix:
+- corrected config
+- systemctl daemon-reload
+- restarted service
+- validated logs clean for 30 minutes
+
+Prevention:
+- add config validation in CI
+- add health check + alert thresholds</code></pre>
+      </div>
+
+      <h3 class="sectionTitle">6) Evidence to Attach</h3>
+      <div class="grid">
+        <div class="tile">
+          <h3>Screenshots</h3>
+          <p>journalctl output, service status, dashboards/alerts.</p>
+        </div>
+        <div class="tile">
+          <h3>Logs</h3>
+          <p>Redact secrets. Keep minimal slices with timestamps.</p>
+        </div>
+        <div class="tile">
+          <h3>RCA Summary</h3>
+          <p>5–10 bullets: impact, timeline, root cause, fix, prevention.</p>
+        </div>
+      </div>
 
       <footer class="footer">
-        <div>Artifacts live beside this page for reliability: queries.sql, explain-plan.md, screenshots.</div>
+        <div>Store artifacts next to this page to prevent broken links and keep reviews fast.</div>
       </footer>
     </div>
   </main>
