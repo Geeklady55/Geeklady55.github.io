@@ -416,6 +416,45 @@ GET  /docs/{docId}/download-url    → pre-signed S3 download URL</div>
         Back to main site: <a href="/">geeklady55.github.io</a>
       </div>
     </footer>
+    <h3>Real CloudWatch Logs (Sample)</h3>
+<pre style="background:#0b1220; color:#e2e8f0; padding:16px; border-radius:12px; overflow:auto; border:1px solid rgba(56,189,248,.25);">
+2025-06-14T19:08:11.427Z INFO  requestId=6c2a9b5f {"service":"vaultlite-api","route":"POST /docs","role":"Contributor","docId":"DOC#9f3d2c5a","action":"DOC_CREATE","status":"Draft","latencyMs":84}
+2025-06-14T19:09:03.112Z INFO  requestId=ab1d6a43 {"service":"vaultlite-api","route":"POST /docs/9f3d2c5a/upload-url","action":"PRESIGN_PUT","bucket":"vaultlite-docs-prod","key":"tenant/t-001/doc/9f3d2c5a/v/v1/Protocol.pdf","expiresSec":900}
+2025-06-14T19:10:41.006Z WARN  requestId=8b3d9cf8 {"route":"POST /docs/9f3d2c5a/approve","role":"Viewer","action":"AUTHZ_DENY","httpStatus":403,"reason":"Viewer cannot approve"}
+2025-06-14T19:12:01.120Z ERROR requestId=0e2d7c66 {"route":"POST /docs/9f3d2c5a/upload-url","errorType":"SignatureDoesNotMatch","hint":"Client Content-Type did not match signed Content-Type","httpStatus":403}
+</pre>
+
+<h3>Lambda Code (Create Document)</h3>
+<pre style="background:#0b1220; color:#e2e8f0; padding:16px; border-radius:12px; overflow:auto; border:1px solid rgba(56,189,248,.25);">
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
+import { randomUUID } from "crypto";
+
+const ddb = DynamoDBDocumentClient.from(new DynamoDBClient({}));
+
+export const handler = async (event) =&gt; {
+  const body = JSON.parse(event.body || "{}");
+  const actor = event.requestContext?.authorizer?.jwt?.claims?.sub || "anonymous";
+  const docId = randomUUID();
+
+  const item = {
+    pk: `DOC#${docId}`,
+    sk: "META",
+    title: body.title || "Untitled",
+    status: "Draft",
+    owner: actor,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+
+  await ddb.send(new PutCommand({
+    TableName: process.env.DOCS_TABLE,
+    Item: item
+  }));
+
+  return { statusCode: 201, body: JSON.stringify({ docId }) };
+};
+</pre>
   </main>
 </body>
 </html>
