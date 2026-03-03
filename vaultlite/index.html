@@ -231,7 +231,22 @@ AWS account activity → CloudTrail Event History
 </section>
       </div>
     </div>
-    </section>
+    
+</section>
+    <div class="card">
+  <h3>Sample CloudWatch Logs (Structured JSON)</h3>
+  <div class="code">2025-06-14T19:08:11.427Z INFO  requestId=6c2a9b5f-0bd5-4d7a-9f8c-8b19c9dcd8a2 {"service":"vaultlite-api","route":"POST /docs","actor":"cognito:us-west-2_AbCdEf:0e3f...","role":"Contributor","docId":"DOC#9f3d2c5a","action":"DOC_CREATE","status":"Draft","latencyMs":84}
+
+2025-06-14T19:09:03.112Z INFO  requestId=ab1d6a43-7b4b-4b2a-a3c6-d7a0b1f3f7b1 {"service":"vaultlite-api","route":"POST /docs/9f3d2c5a/upload-url","actor":"cognito:...","docId":"DOC#9f3d2c5a","action":"PRESIGN_PUT","bucket":"vaultlite-docs-prod","key":"tenant/t-001/doc/9f3d2c5a/v/v1/Protocol.pdf","expiresSec":900,"contentType":"application/pdf"}
+
+2025-06-14T19:09:09.884Z INFO  requestId=1fdb2c11-8e46-4df7-9fb8-2b7f8c5a1b32 {"service":"vaultlite-api","route":"POST /docs/9f3d2c5a/submit","actor":"cognito:...","role":"Contributor","docId":"DOC#9f3d2c5a","action":"WORKFLOW_START","fromStatus":"Draft","toStatus":"Review","sfExecution":"arn:aws:states:us-west-2:123456789012:execution:VaultLiteWorkflow:exec-8f1a..."}
+
+2025-06-14T19:10:41.006Z WARN  requestId=8b3d9cf8-0f2b-4f2a-9f35-16a3b5c2b722 {"service":"vaultlite-api","route":"POST /docs/9f3d2c5a/approve","actor":"cognito:...","role":"Viewer","docId":"DOC#9f3d2c5a","action":"AUTHZ_DENY","reason":"Viewer cannot approve documents","httpStatus":403}
+
+2025-06-14T19:11:22.539Z INFO  requestId=9a4b1d91-0a2f-4c90-9f0a-6b4dfd51ef44 {"service":"vaultlite-api","route":"POST /docs/9f3d2c5a/approve","actor":"cognito:...","role":"Approver","docId":"DOC#9f3d2c5a","action":"DOC_APPROVE","fromStatus":"Review","toStatus":"Approved","auditEvent":"TS#2025-06-14T19:11:22.530Z#EVT#b1a9..."}
+
+2025-06-14T19:12:01.120Z ERROR requestId=0e2d7c66-1c3f-4c35-a9c2-7bd83c2a4c64 {"service":"vaultlite-api","route":"POST /docs/9f3d2c5a/upload-url","actor":"cognito:...","docId":"DOC#9f3d2c5a","action":"PRESIGN_PUT","errorType":"SignatureDoesNotMatch","hint":"Client Content-Type did not match signed Content-Type","httpStatus":403,"resolution":"Sign the request with the exact Content-Type the client will send"} </div>
+</div>
 
     <section id="build" class="section">
       <h2>Beginner Build Steps</h2>
@@ -274,6 +289,97 @@ POST /docs/{docId}/reject
 GET  /docs/{docId}/download-url</div>
       </div>
     </section>
+    <div class="card">
+  <h3>Lambda: Create Document (Node.js)</h3>
+  <div class="code">import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
+import { randomUUID } from "crypto";
+
+const ddb = DynamoDBDocumentClient.from(new DynamoDBClient({}));
+
+export const handler = async (event) => {
+  const requestId = event.requestContext?.requestId || randomUUID();
+  const actor = event.requestContext?.authorizer?.jwt?.claims?.sub || "anonymous";
+
+  const body = JSON.parse(event.body || "{}");
+  const docId = randomUUID();
+
+  const item = {
+    pk: `DOC#${docId}`,
+    sk: "META",
+    title: body.title || "Untitled",
+    docType: body.docType || "General",
+    status: "Draft",
+    owner: actor,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    latestVersionId: null,
+    tags: body.tags || []
+  };
+
+  await ddb.send(new PutCommand({
+    TableName: process.env.DOCS_TABLE,
+    Item: item,
+    ConditionExpression: "attribute_not_exists(pk)"
+  }));
+
+  console.log(JSON.stringify({
+    level: "INFO",
+    requestId,
+    action: "DOC_CREATE",
+    docId: item.pk,
+    status: item.status
+  }));
+
+  return {
+    statusCode: 201,
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ docId, status: item.status })
+  };
+};</div>
+</div>
+    <div class="card">
+  <h3>Audit Logging Pattern (Append-only)</h3>
+  <div class="code">const auditEvent = {
+  pk: `DOC#${docId}`,
+  sk: `TS#${new Date().toISOString()}#EVT#${crypto.randomUUID()}`,
+  actor,
+  action: "DOC_APPROVE",
+  fromStatus: "Review",
+  toStatus: "Approved",
+  ip: event.requestContext?.identity?.sourceIp,
+  userAgent: event.headers?.["user-agent"]
+};
+
+// Put into AuditEvents table (no updates, no deletes)
+await ddb.send(new PutCommand({
+  TableName: process.env.AUDIT_TABLE,
+  Item: auditEvent
+}));</div>
+</div>
+    <div class="card">
+  <h3>API Endpoints</h3>
+  <div class="code">POST /docs                         → create document metadata (Draft)
+GET  /docs                         → list docs (status/owner filters)
+GET  /docs/{docId}                 → doc details + latest version
+POST /docs/{docId}/upload-url      → pre-signed S3 upload URL
+POST /docs/{docId}/submit          → Draft → Review (starts workflow)
+POST /docs/{docId}/approve         → Review → Approved (Approver only)
+POST /docs/{docId}/reject          → Review → Rejected (Approver only)
+GET  /docs/{docId}/download-url    → pre-signed S3 download URL</div>
+</div>
+
+    <div class="card">
+  <h3>API Endpoints</h3>
+  <div class="code">POST /docs                         → create document metadata (Draft)
+GET  /docs                         → list docs (status/owner filters)
+GET  /docs/{docId}                 → doc details + latest version
+POST /docs/{docId}/upload-url      → pre-signed S3 upload URL
+POST /docs/{docId}/submit          → Draft → Review (starts workflow)
+POST /docs/{docId}/approve         → Review → Approved (Approver only)
+POST /docs/{docId}/reject          → Review → Rejected (Approver only)
+GET  /docs/{docId}/download-url    → pre-signed S3 download URL</div>
+</div>
 
     <section id="security" class="section">
       <h2>Security & Audit</h2>
