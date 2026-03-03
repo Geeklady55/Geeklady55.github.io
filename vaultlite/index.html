@@ -484,49 +484,49 @@ GET  /docs/{docId}/download-url    → pre-signed S3 download URL</div>
   <!-- 1) Architecture -->
   <div style="margin:30px 0; padding:18px; border-radius:14px; background:rgba(11,18,32,.55); border:1px solid rgba(56,189,248,.18);">
     <h3>1) Architecture Diagram</h3>
-    <img src="evidence_architecture.png" alt="VaultLite architecture diagram" style="width:100%; border-radius:12px; margin-top:14px;">
+    <img src="evidence/evidence_architecture.png" alt="VaultLite architecture diagram" style="width:100%; border-radius:12px; margin-top:14px;">
   </div>
 
   <!-- 2) Postman -->
   <div style="margin:30px 0; padding:18px; border-radius:14px; background:rgba(11,18,32,.55); border:1px solid rgba(56,189,248,.18);">
     <h3>2) Postman/Insomnia API Test</h3>
     <p style="color:#94a3b8;">Shows successful calls to create a doc, request a pre-signed URL, submit for review, and approve.</p>
-    <img src="evidence_postman.png" alt="Postman or Insomnia API test" style="width:100%; border-radius:12px; margin-top:14px;">
+    <img src="evidence/evidence_postman.png" alt="Postman or Insomnia API test" style="width:100%; border-radius:12px; margin-top:14px;">
   </div>
 
   <!-- 3) S3 -->
   <div style="margin:30px 0; padding:18px; border-radius:14px; background:rgba(11,18,32,.55); border:1px solid rgba(56,189,248,.18);">
     <h3>3) S3 Object Created After Upload</h3>
     <p style="color:#94a3b8;">Demonstrates the document stored with a versioned key naming pattern.</p>
-    <img src="evidence_s3.png" alt="S3 object after upload" style="width:100%; border-radius:12px; margin-top:14px;">
+    <img src="evidence/evidence_s3.png" alt="S3 object after upload" style="width:100%; border-radius:12px; margin-top:14px;">
   </div>
 
   <!-- 4) DynamoDB Documents -->
   <div style="margin:30px 0; padding:18px; border-radius:14px; background:rgba(11,18,32,.55); border:1px solid rgba(56,189,248,.18);">
     <h3>4) DynamoDB Documents Item</h3>
     <p style="color:#94a3b8;">Metadata record (pk/sk, title, status, owner, timestamps, latestVersionId).</p>
-    <img src="evidence_ddb_documents.png" alt="DynamoDB Documents item" style="width:100%; border-radius:12px; margin-top:14px;">
+    <img src="evidence/evidence_ddb_documents.png" alt="DynamoDB Documents item" style="width:100%; border-radius:12px; margin-top:14px;">
   </div>
 
   <!-- 5) DynamoDB AuditEvents -->
   <div style="margin:30px 0; padding:18px; border-radius:14px; background:rgba(11,18,32,.55); border:1px solid rgba(56,189,248,.18);">
     <h3>5) DynamoDB AuditEvents Rows</h3>
     <p style="color:#94a3b8;">Append-only audit trail showing status transitions and actor details.</p>
-    <img src="evidence_ddb_audit.png" alt="DynamoDB AuditEvents rows" style="width:100%; border-radius:12px; margin-top:14px;">
+    <img src="evidence/evidence_ddb_audit.png" alt="DynamoDB AuditEvents rows" style="width:100%; border-radius:12px; margin-top:14px;">
   </div>
 
   <!-- 6) Step Functions -->
   <div style="margin:30px 0; padding:18px; border-radius:14px; background:rgba(11,18,32,.55); border:1px solid rgba(56,189,248,.18);">
     <h3>6) Step Functions Execution Path</h3>
     <p style="color:#94a3b8;">Workflow trace for Draft → Review → Approved/Rejected.</p>
-    <img src="evidence_stepfunctions.png" alt="Step Functions execution path" style="width:100%; border-radius:12px; margin-top:14px;">
+    <img src="evidence/evidence_stepfunctions.png" alt="Step Functions execution path" style="width:100%; border-radius:12px; margin-top:14px;">
   </div>
 
   <!-- 7) CloudWatch -->
   <div style="margin:30px 0; padding:18px; border-radius:14px; background:rgba(11,18,32,.55); border:1px solid rgba(56,189,248,.18);">
     <h3>7) CloudWatch Logs (Structured JSON)</h3>
     <p style="color:#94a3b8;">Shows correlation IDs, actor, action, docId, and status transitions.</p>
-    <img src="evidence_cloudwatch.png" alt="CloudWatch logs screenshot" style="width:100%; border-radius:12px; margin-top:14px;">
+    <img src="evidence/evidence_cloudwatch.png" alt="CloudWatch logs screenshot" style="width:100%; border-radius:12px; margin-top:14px;">
   </div>
 
   <!-- 8) Error + Fix -->
@@ -536,7 +536,7 @@ GET  /docs/{docId}/download-url    → pre-signed S3 download URL</div>
       Example of a real upload issue caused by a Content-Type mismatch between the client request and the signed URL.
       Fix: sign and send the exact Content-Type used by the client, and validate headers before upload.
     </p>
-    <img src="evidence_error_fix.png" alt="Error and fix screenshot" style="width:100%; border-radius:12px; margin-top:14px;">
+    <img src="evidence/evidence_error_fix.png" alt="Error and fix screenshot" style="width:100%; border-radius:12px; margin-top:14px;">
   </div>
 </section>
 
