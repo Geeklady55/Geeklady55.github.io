@@ -4,8 +4,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Linux Case Study: Log Triage Toolkit | SQL + Linux Portfolio</title>
-  <meta name="description" content="Linux log triage toolkit: repeatable steps, commands, and scripts for root cause analysis." />
+  <title>Linux Case Study: Incident Triage Kit | SQL + Linux Portfolio</title>
+  <meta name="description" content="Linux bash toolkit: evidence collection, anomaly flags, report.md/report.json, service mode, and validation steps." />
   <link rel="stylesheet" href="../../../assets/css/styles.css" />
 </head>
 <body>
@@ -33,131 +33,180 @@
       <div class="breadcrumb">
         <a href="../../../">Home</a><span>›</span>
         <a href="../../../linux.html">Linux</a><span>›</span>
-        <span>Log Triage Toolkit</span>
+        <span>Incident Triage Kit</span>
       </div>
 
-      <h2 class="h1" style="margin-top:10px;">Linux Case Study: Log Triage Toolkit</h2>
+      <h2 class="h1" style="margin-top:10px;">Linux Case Study: Incident Triage Kit (triage.sh)</h2>
       <p class="sub">
-        A repeatable incident workflow for quickly narrowing down the root cause using journald, service status,
-        and targeted filtering. Replace sample outputs with real screenshots and logs as you build.
+        Portfolio project built like real on-call work:
+        collect evidence fast, flag obvious “bad smells,” and output both a clean human report and machine-readable JSON.
+        The goal is repeatability, auditability, and speed.
       </p>
 
       <div class="ctaRow">
-        <a class="btn primary" href="./commands.md" download>Download commands.md</a>
-        <a class="btn" href="./scripts/triage.sh" download>Download triage.sh</a>
+        <a class="btn primary" href="./scripts/triage.sh" download>Download triage.sh</a>
+        <a class="btn" href="./commands.md" download>Download commands.md</a>
+        <a class="btn" href="./sample-report.md" download>Download sample-report.md</a>
         <a class="btn" href="../../../linux.html">Back to Linux</a>
       </div>
 
       <hr class="sep" />
 
-      <h3 class="sectionTitle">1) Goal</h3>
+      <h3 class="sectionTitle">1) What This Tool Solves</h3>
       <p class="sub">
-        Provide a consistent playbook for investigating service failures (timeouts, restarts, 5xx errors), capturing evidence,
-        and producing a short RCA summary.
+        When incidents hit, engineers waste time re-running the same basic commands and forgetting to capture evidence.
+        This kit standardizes the process:
+        consistent outputs, predictable folder structure, quick anomaly flags, and a report that can be pasted into tickets.
       </p>
 
-      <h3 class="sectionTitle">2) Environment</h3>
-      <div class="code">
-        <pre><code>OS: Ubuntu / RHEL (document your version)
-Logging: journald + /var/log/*
-Tools: journalctl, systemctl, ss, ip, df, free, top, grep, awk</code></pre>
-      </div>
-
-      <h3 class="sectionTitle">3) Step-by-step Workflow</h3>
-
+      <h3 class="sectionTitle">2) Tool Design</h3>
       <div class="grid">
         <div class="tile">
-          <h3>Step A: Confirm service state</h3>
-          <p>Identify the failing unit and the last restart reason.</p>
+          <h3>Inputs</h3>
+          <p><code>--since</code> timeframe, optional <code>--service</code>, optional <code>--bundle</code> tarball output.</p>
+          <div class="meta"><span class="tag">CLI</span><span class="tag">Safe Defaults</span></div>
         </div>
         <div class="tile">
-          <h3>Step B: Pull focused logs</h3>
-          <p>Filter by unit and timeframe to reduce noise.</p>
+          <h3>Outputs</h3>
+          <p><code>report.md</code> + <code>report.json</code> + evidence files (txt) + optional <code>.tar.gz</code> bundle.</p>
+          <div class="meta"><span class="tag">Evidence</span><span class="tag">Automation-ready</span></div>
         </div>
         <div class="tile">
-          <h3>Step C: Validate system health</h3>
-          <p>Check CPU/mem/disk, network sockets, DNS, and dependencies.</p>
+          <h3>Signals</h3>
+          <p>Disk &gt;85%, high load, OOM kills, restart loops, unexpected listening ports, auth failures.</p>
+          <div class="meta"><span class="tag">Severity Tags</span><span class="tag">RCA</span></div>
         </div>
       </div>
 
-      <div class="code" style="margin-top:12px;">
-        <pre><code># Step A: Service health
-systemctl status myservice --no-pager
-systemctl is-failed myservice
-systemctl show -p ActiveEnterTimestamp myservice
+      <h3 class="sectionTitle">3) Step-by-step (Real Commands)</h3>
+      <p class="sub">
+        This is the exact workflow the script automates. I keep these steps documented so the process is transparent and reviewable.
+      </p>
 
-# Step B: Logs (last 2 hours)
-journalctl -u myservice --since "2 hours ago" --no-pager
-journalctl -u myservice -p warning --since "2 hours ago" --no-pager
-
-# Step C: Quick system checks
-df -h
-free -m
+      <div class="code">
+        <pre><code># A) Identify system & baseline
+uname -a
+( command -v lsb_release >/dev/null 2>&1 && lsb_release -a ) || cat /etc/os-release
 uptime
-ss -tulpn | head
+
+# B) CPU / Memory / Disk
+top -b -n1 | head -n 30
+free -m
+df -h
+dmesg -T | tail -n 50
+
+# C) Networking
 ip a
-resolvectl status 2>/dev/null || cat /etc/resolv.conf</code></pre>
+ip r
+ss -tulpn | head -n 80
+( command -v resolvectl >/dev/null 2>&1 && resolvectl status ) || cat /etc/resolv.conf
+
+# D) Logs (time boxed)
+journalctl -xe --no-pager | tail -n 200
+# Service-specific:
+journalctl -u nginx --since "2 hours ago" --no-pager | tail -n 300
+
+# E) Security signals
+# SSH failures (varies by distro; journalctl is most reliable)
+journalctl _SYSTEMD_UNIT=ssh.service --since "24 hours ago" --no-pager | grep -Ei "failed|invalid|authentication|bad protocol" | tail -n 80
+# Recent sudo usage
+journalctl -t sudo --since "24 hours ago" --no-pager | tail -n 80</code></pre>
       </div>
 
-      <h3 class="sectionTitle">4) Scripted Triage (optional)</h3>
-      <p class="sub">
-        Include a script to standardize evidence capture. Keep it safe by default (read-only) and clearly label outputs.
-      </p>
+      <h3 class="sectionTitle">4) Script Usage</h3>
       <div class="code">
-        <pre><code># Example usage (your script can implement this):
-bash ./scripts/triage.sh myservice 2h
+        <pre><code># Basic: last 2 hours
+bash triage.sh --since "2h"
 
-# Recommended output files:
-# triage_myservice_YYYYMMDD_HHMM/
-#   systemctl_status.txt
-#   journalctl_last2h.txt
-#   sockets.txt
-#   disk.txt
-#   mem.txt</code></pre>
+# Service mode: focus on a unit + config checksum (example: nginx)
+bash triage.sh --since "2h" --service nginx
+
+# Create a bundle
+bash triage.sh --since "6h" --service nginx --bundle</code></pre>
       </div>
 
-      <h3 class="sectionTitle">5) What Broke + Fix</h3>
-      <p class="sub">
-        Add a real example here. Format:
-      </p>
+      <h3 class="sectionTitle">5) Example Output Structure</h3>
       <div class="code">
-        <pre><code>Symptom:
-- service restarting every 30s
-- upstream returning 502
-
-Root Cause:
-- config typo in /etc/myservice/config.yml
-- missing env var after deploy
-
-Fix:
-- corrected config
-- systemctl daemon-reload
-- restarted service
-- validated logs clean for 30 minutes
-
-Prevention:
-- add config validation in CI
-- add health check + alert thresholds</code></pre>
+        <pre><code>triage_2026-03-03_1412/
+  report.md
+  report.json
+  identity.txt
+  cpu_mem.txt
+  disk.txt
+  network.txt
+  listeners.txt
+  dmesg_tail.txt
+  journal_tail.txt
+  service_nginx_status.txt
+  service_nginx_logs.txt
+  security_signals.txt
+  bundle.tar.gz   (optional)</code></pre>
       </div>
 
-      <h3 class="sectionTitle">6) Evidence to Attach</h3>
+      <h3 class="sectionTitle">6) “Bad Smell” Detection (Severity Tags)</h3>
+      <p class="sub">
+        The script flags common issues early. The goal is not “AI,” it’s fast triage: detect obvious root cause candidates immediately.
+      </p>
+
       <div class="grid">
         <div class="tile">
-          <h3>Screenshots</h3>
-          <p>journalctl output, service status, dashboards/alerts.</p>
+          <h3>Disk pressure</h3>
+          <p><strong>HIGH</strong> if any mount &gt; 85%.</p>
         </div>
         <div class="tile">
-          <h3>Logs</h3>
-          <p>Redact secrets. Keep minimal slices with timestamps.</p>
+          <h3>OOM / memory</h3>
+          <p><strong>HIGH</strong> if dmesg shows OOM kills or free memory is critically low.</p>
         </div>
         <div class="tile">
-          <h3>RCA Summary</h3>
-          <p>5–10 bullets: impact, timeline, root cause, fix, prevention.</p>
+          <h3>Restart loops</h3>
+          <p><strong>MED/HIGH</strong> if systemd shows repeated restarts within the timeframe.</p>
         </div>
+      </div>
+
+      <h3 class="sectionTitle">7) Validation Steps (How I Prove It Works)</h3>
+      <p class="sub">
+        I validate this tool like production automation:
+        predictable outputs, safe permissions, no secrets leaking, and repeatable tests with known scenarios.
+      </p>
+
+      <div class="code">
+        <pre><code># 1) Dry-run safety: ensure script is read-only
+# - no rm/mv/chmod on system paths
+# - only writes under triage_* output dir
+
+# 2) Run on a known-good host (baseline)
+bash triage.sh --since "1h"
+# Expect: no HIGH severity flags, report still generated
+
+# 3) Create a controlled failure (non-destructive)
+# Example A: fill a temp filesystem (if safe in your lab)
+# Example B: restart a test service repeatedly and confirm "restart loop" flag
+for i in $(seq 1 5); do sudo systemctl restart cron; sleep 2; done
+bash triage.sh --since "15m" --service cron
+
+# 4) Validate JSON format
+# (use jq if available)
+command -v jq >/dev/null 2>&1 && jq . triage_*/report.json >/dev/null
+
+# 5) Secret hygiene check (basic)
+# Ensure report files do not contain tokens/passwords
+grep -RniE "token|password|secret|authorization: bearer" triage_* || true</code></pre>
+      </div>
+
+      <h3 class="sectionTitle">8) CI Add-on (Optional, Portfolio Booster)</h3>
+      <p class="sub">
+        Add GitHub Actions + ShellCheck so the script stays clean and reviewable.
+        (I include this because employers want to see maintainability, not just “it works on my laptop.”)
+      </p>
+
+      <div class="code">
+        <pre><code># Suggested repo additions:
+# .github/workflows/shellcheck.yml
+# Run shellcheck on triage.sh and fail PRs if issues are found.</code></pre>
       </div>
 
       <footer class="footer">
-        <div>Store artifacts next to this page to prevent broken links and keep reviews fast.</div>
+        <div><strong>What this proves:</strong> I can troubleshoot like an SRE/support engineer, automate evidence collection, and produce clean incident artifacts.</div>
       </footer>
     </div>
   </main>
