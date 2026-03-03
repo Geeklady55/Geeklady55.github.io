@@ -1,1 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SQL Case Study: Performance Tuning | SQL + Linux Portfolio</title>
+  <meta name="description" content="SQL performance tuning case study: validate, optimize, and prove improvement." />
+  <link rel="stylesheet" href="../../../assets/css/styles.css" />
+</head>
+<body>
+  <div class="topbar">
+    <div class="nav">
+      <a class="brand" href="../../../">
+        <span class="logo" aria-hidden="true"></span>
+        <div>
+          <h1>SQL + Linux Portfolio</h1>
+          <span class="mini">Advanced queries • SysAdmin projects • Step-by-step case studies</span>
+        </div>
+      </a>
+      <div class="navlinks">
+        <a class="pill" href="../../../">Home</a>
+        <a class="pill active" href="../../../sql.html">SQL</a>
+        <a class="pill" href="../../../linux.html">Linux</a>
+        <a class="pill" href="../../../about.html">About</a>
+        <a class="pill" href="https://github.com/Geeklady55" target="_blank" rel="noreferrer">GitHub</a>
+      </div>
+    </div>
+  </div>
 
+  <main class="container">
+    <div class="card">
+      <div class="breadcrumb">
+        <a href="../../../">Home</a><span>›</span>
+        <a href="../../../sql.html">SQL</a><span>›</span>
+        <span>Performance Tuning</span>
+      </div>
+
+      <h2 class="h1" style="margin-top:10px;">SQL Case Study: Performance Tuning</h2>
+      <p class="sub">
+        Template case study. Replace the placeholders with your real schema, EXPLAIN output, timings, and evidence screenshots.
+        Keep artifacts in this folder so links remain stable.
+      </p>
+
+      <div class="ctaRow">
+        <a class="btn primary" href="./queries.sql" download>Download queries.sql</a>
+        <a class="btn" href="./explain-plan.md" download>Download explain-plan.md</a>
+        <a class="btn" href="../../../sql.html">Back to SQL</a>
+      </div>
+
+      <hr class="sep" />
+
+      <h3 class="sectionTitle">1) Problem</h3>
+      <p class="sub">
+        The reporting query was timing out under load / scanning too many rows. Goal: reduce runtime and improve predictability
+        without changing the business result.
+      </p>
+
+      <h3 class="sectionTitle">2) Context / Tables</h3>
+      <p class="sub">
+        Replace with your real table names and key columns. Keep it short and focused on join keys and filters.
+      </p>
+      <div class="code">
+        <pre><code>-- Example (replace with your schema notes)
+orders(order_id, customer_id, order_ts, status, total)
+customers(customer_id, email, created_ts, region)
+order_items(order_id, sku, qty, price)
+
+-- Common filters:
+-- orders.status in ('PAID','SHIPPED')
+-- orders.order_ts between :start and :end</code></pre>
+      </div>
+
+      <h3 class="sectionTitle">3) Baseline (Before)</h3>
+      <p class="sub">
+        Capture measurable evidence: execution time, rows scanned, and the EXPLAIN plan output.
+      </p>
+      <div class="code">
+        <pre><code>-- BEFORE (sample)
+WITH base AS (
+  SELECT o.customer_id, o.order_id, o.total, o.order_ts
+  FROM orders o
+  WHERE o.status IN ('PAID','SHIPPED')
+    AND o.order_ts &gt;= :start
+    AND o.order_ts &lt;  :end
+)
+SELECT customer_id,
+       COUNT(*) AS orders,
+       SUM(total) AS revenue
+FROM base
+GROUP BY customer_id
+ORDER BY revenue DESC
+LIMIT 50;</code></pre>
+      </div>
+      <p class="small">
+        Add: before-plan screenshot (e.g. <code>./explain-before.png</code>) and timing evidence (CloudWatch, AWR, pg_stat_statements, etc.).
+      </p>
+
+      <h3 class="sectionTitle">4) Diagnosis</h3>
+      <div class="grid">
+        <div class="tile">
+          <h3>Observed</h3>
+          <p>Full table scans, heavy sort, or poor join order causing high IO / latency spikes.</p>
+        </div>
+        <div class="tile">
+          <h3>Tools</h3>
+          <p>EXPLAIN / EXPLAIN ANALYZE, query stats, and row estimates vs actual.</p>
+        </div>
+        <div class="tile">
+          <h3>Hypothesis</h3>
+          <p>Improve selectivity by indexing filter columns + reduce sort/aggregation cost.</p>
+        </div>
+      </div>
+
+      <h3 class="sectionTitle">5) Optimization (After)</h3>
+      <p class="sub">
+        Document what changed and why: indexes, query rewrite, predicate pushdown, reduced data movement.
+      </p>
+      <div class="code">
+        <pre><code>-- AFTER (sample improvements)
+-- Index ideas (adapt to your DB engine):
+-- CREATE INDEX idx_orders_status_ts ON orders(status, order_ts);
+-- CREATE INDEX idx_orders_customer_ts ON orders(customer_id, order_ts);
+
+SELECT o.customer_id,
+       COUNT(*) AS orders,
+       SUM(o.total) AS revenue
+FROM orders o
+WHERE o.status IN ('PAID','SHIPPED')
+  AND o.order_ts &gt;= :start
+  AND o.order_ts &lt;  :end
+GROUP BY o.customer_id
+ORDER BY revenue DESC
+LIMIT 50;</code></pre>
+      </div>
+
+      <h3 class="sectionTitle">6) Validation Strategy</h3>
+      <p class="sub">
+        Show how you confirmed the optimized query returns the same results before making changes in production.
+      </p>
+      <div class="code">
+        <pre><code>-- Example validation approach:
+-- 1) Run before + after for a fixed date range
+-- 2) Compare aggregate checksums / row counts
+
+-- Row-count compare (example)
+-- SELECT COUNT(*) FROM (before_query) b;
+-- SELECT COUNT(*) FROM (after_query)  a;
+
+-- Revenue compare (example)
+-- SELECT SUM(revenue) FROM (before_query) b;
+-- SELECT SUM(revenue) FROM (after_query)  a;</code></pre>
+      </div>
+
+      <h3 class="sectionTitle">7) Results</h3>
+      <p class="sub">
+        Replace with real metrics (example format): runtime reduced from <strong>12.4s → 1.9s</strong>, rows scanned reduced by <strong>85%</strong>.
+      </p>
+
+      <h3 class="sectionTitle">8) What I’d Improve Next</h3>
+      <p class="sub">
+        Examples: partitioning by date, materialized views, caching strategy, further index tuning, query plan regression tests.
+      </p>
+
+      <footer class="footer">
+        <div>Artifacts live beside this page for reliability: queries.sql, explain-plan.md, screenshots.</div>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>
