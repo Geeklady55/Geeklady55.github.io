@@ -1,1 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SQL Projects | SQL + Linux Portfolio</title>
+  <meta name="description" content="Advanced SQL portfolio: query packs, tuning notes, and validation checks." />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+  <div class="topbar">
+    <div class="nav">
+      <a class="brand" href="./">
+        <span class="logo" aria-hidden="true"></span>
+        <div>
+          <h1>SQL + Linux Portfolio</h1>
+          <span class="mini">Advanced queries • SysAdmin projects • Step-by-step case studies</span>
+        </div>
+      </a>
+      <div class="navlinks">
+        <a class="pill" href="./">Home</a>
+        <a class="pill active" href="sql.html">SQL</a>
+        <a class="pill" href="linux.html">Linux</a>
+        <a class="pill" href="about.html">About</a>
+        <a class="pill" href="https://github.com/Geeklady55" target="_blank" rel="noreferrer">GitHub</a>
+      </div>
+    </div>
+  </div>
 
+  <main class="container">
+    <div class="card">
+      <div class="breadcrumb">
+        <a href="./">Home</a><span>›</span><span>SQL</span>
+      </div>
+
+      <h2 class="h1" style="margin-top:10px;">Advanced SQL Projects</h2>
+      <p class="sub">
+        Each project includes: problem statement, approach, final queries, validation strategy, and performance notes.
+        Add your full query packs as downloadable files (e.g., <code>queries.sql</code>) inside each project folder.
+      </p>
+
+      <h3 class="sectionTitle">Projects</h3>
+      <div class="list">
+        <div class="item">
+          <div class="left">
+            <h3>Performance Tuning Case Study</h3>
+            <p>
+              CTEs + window functions with validation checks and EXPLAIN plan notes.
+              Demonstrates identifying bottlenecks, adding indexes, and proving improvement.
+            </p>
+            <div class="meta" style="margin-top:10px;">
+              <span class="tag">EXPLAIN</span><span class="tag">Indexes</span><span class="tag">CTE</span><span class="tag">Window</span>
+            </div>
+          </div>
+          <div class="right">
+            <a class="link" href="projects/sql/performance-tuning/">Open Case Study</a>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="left">
+            <h3>Coming Soon: De-dup Detection Queries</h3>
+            <p>
+              Identify duplicates at scale using deterministic + fuzzy rules, plus a validation plan before bulk updates.
+            </p>
+            <div class="meta" style="margin-top:10px;">
+              <span class="tag">Data Quality</span><span class="tag">Validation</span><span class="tag">Rules</span>
+            </div>
+          </div>
+          <div class="right">
+            <span class="small">Add under: <code>projects/sql/dedup-detection/</code></span>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="left">
+            <h3>Coming Soon: Audit / Change History</h3>
+            <p>
+              Track changes using audit tables and query patterns for “who changed what, when, and why”.
+            </p>
+            <div class="meta" style="margin-top:10px;">
+              <span class="tag">Audit</span><span class="tag">CDC</span><span class="tag">Forensics</span>
+            </div>
+          </div>
+          <div class="right">
+            <span class="small">Add under: <code>projects/sql/audit-history/</code></span>
+          </div>
+        </div>
+      </div>
+
+      <hr class="sep" />
+
+      <h3 class="sectionTitle">Recommended Artifacts to Add</h3>
+      <div class="grid">
+        <div class="tile">
+          <h3>queries.sql</h3>
+          <p>Full query pack with comments. Keep the page sample short, link the full file for download.</p>
+        </div>
+        <div class="tile">
+          <h3>schema.sql</h3>
+          <p>Minimal schema snippets (tables/keys/indexes) so reviewers understand the query context.</p>
+        </div>
+        <div class="tile">
+          <h3>explain-plan.md</h3>
+          <p>Before/after EXPLAIN output and what changed. Include measurable timing/rows when possible.</p>
+        </div>
+      </div>
+
+      <footer class="footer">
+        <div>Tip: Keep filenames lowercase and avoid spaces to prevent GitHub Pages path issues.</div>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>
