@@ -1,1 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Linux Case Study: Incident Triage Kit | SQL + Linux Portfolio</title>
+  <meta name="description" content="Linux bash toolkit: evidence collection, anomaly flags, report.md/report.json, service mode, and validation steps." />
+  <link rel="stylesheet" href="/sql-linux-portfolio/assets/css/styles.css">
+</head>
+<body>
+  <div class="topbar">
+    <div class="nav">
+      <a class="brand" href="../../../">
+        <span class="logo" aria-hidden="true"></span>
+        <div>
+          <h1>SQL + Linux Portfolio</h1>
+          <span class="mini">Advanced queries • SysAdmin projects • Step-by-step case studies</span>
+        </div>
+      </a>
+      <div class="navlinks">
+        <a class="pill" href="../../../">Home</a>
+        <a class="pill" href="../../../sql.html">SQL</a>
+        <a class="pill active" href="../../../linux.html">Linux</a>
+        <a class="pill" href="../../../about.html">About</a>
+        <a class="pill" href="https://github.com/Geeklady55" target="_blank" rel="noreferrer">GitHub</a>
+      </div>
+    </div>
+  </div>
 
+  <main class="container">
+    <div class="card">
+      <div class="breadcrumb">
+        <a href="../../../">Home</a><span>›</span>
+        <a href="../../../linux.html">Linux</a><span>›</span>
+        <span>Incident Triage Kit</span>
+      </div>
+
+      <h2 class="h1" style="margin-top:10px;">Linux Case Study: Incident Triage Kit (triage.sh)</h2>
+      <p class="sub">
+        Portfolio project built like real on-call work:
+        collect evidence fast, flag obvious “bad smells,” and output both a clean human report and machine-readable JSON.
+        The goal is repeatability, auditability, and speed.
+      </p>
+
+      <div class="ctaRow">
+        <a class="btn primary" href="./scripts/triage.sh" download>Download triage.sh</a>
+        <a class="btn" href="./commands.md" download>Download commands.md</a>
+        <a class="btn" href="./sample-report.md" download>Download sample-report.md</a>
+        <a class="btn" href="../../../linux.html">Back to Linux</a>
+      </div>
+
+      <hr class="sep" />
+
+      <h3 class="sectionTitle">1) What This Tool Solves</h3>
+      <p class="sub">
+        When incidents hit, engineers waste time re-running the same basic commands and forgetting to capture evidence.
+        This kit standardizes the process:
+        consistent outputs, predictable folder structure, quick anomaly flags, and a report that can be pasted into tickets.
+      </p>
+
+      <h3 class="sectionTitle">2) Tool Design</h3>
+      <div class="grid">
+        <div class="tile">
+          <h3>Inputs</h3>
+          <p><code>--since</code> timeframe, optional <code>--service</code>, optional <code>--bundle</code> tarball output.</p>
+          <div class="meta"><span class="tag">CLI</span><span class="tag">Safe Defaults</span></div>
+        </div>
+        <div class="tile">
+          <h3>Outputs</h3>
+          <p><code>report.md</code> + <code>report.json</code> + evidence files (txt) + optional <code>.tar.gz</code> bundle.</p>
+          <div class="meta"><span class="tag">Evidence</span><span class="tag">Automation-ready</span></div>
+        </div>
+        <div class="tile">
+          <h3>Signals</h3>
+          <p>Disk &gt;85%, high load, OOM kills, restart loops, unexpected listening ports, auth failures.</p>
+          <div class="meta"><span class="tag">Severity Tags</span><span class="tag">RCA</span></div>
+        </div>
+      </div>
+
+      <h3 class="sectionTitle">3) Step-by-step (Real Commands)</h3>
+      <p class="sub">
+        This is the exact workflow the script automates. I keep these steps documented so the process is transparent and reviewable.
+      </p>
+
+      <div class="code">
+        <pre><code># A) Identify system & baseline
+uname -a
+( command -v lsb_release >/dev/null 2>&1 && lsb_release -a ) || cat /etc/os-release
+uptime
+
+# B) CPU / Memory / Disk
+top -b -n1 | head -n 30
+free -m
+df -h
+dmesg -T | tail -n 50
+
+# C) Networking
+ip a
+ip r
+ss -tulpn | head -n 80
+( command -v resolvectl >/dev/null 2>&1 && resolvectl status ) || cat /etc/resolv.conf
+
+# D) Logs (time boxed)
+journalctl -xe --no-pager | tail -n 200
+# Service-specific:
+journalctl -u nginx --since "2 hours ago" --no-pager | tail -n 300
+
+# E) Security signals
+# SSH failures (varies by distro; journalctl is most reliable)
+journalctl _SYSTEMD_UNIT=ssh.service --since "24 hours ago" --no-pager | grep -Ei "failed|invalid|authentication|bad protocol" | tail -n 80
+# Recent sudo usage
+journalctl -t sudo --since "24 hours ago" --no-pager | tail -n 80</code></pre>
+      </div>
+
+      <h3 class="sectionTitle">4) Script Usage</h3>
+      <div class="code">
+        <pre><code># Basic: last 2 hours
+bash triage.sh --since "2h"
+
+# Service mode: focus on a unit + config checksum (example: nginx)
+bash triage.sh --since "2h" --service nginx
+
+# Create a bundle
+bash triage.sh --since "6h" --service nginx --bundle</code></pre>
+      </div>
+
+      <h3 class="sectionTitle">5) Example Output Structure</h3>
+      <div class="code">
+        <pre><code>triage_2026-03-03_1412/
+  report.md
+  report.json
+  identity.txt
+  cpu_mem.txt
+  disk.txt
+  network.txt
+  listeners.txt
+  dmesg_tail.txt
+  journal_tail.txt
+  service_nginx_status.txt
+  service_nginx_logs.txt
+  security_signals.txt
+  bundle.tar.gz   (optional)</code></pre>
+      </div>
+
+      <h3 class="sectionTitle">6) “Bad Smell” Detection (Severity Tags)</h3>
+      <p class="sub">
+        The script flags common issues early. The goal is not “AI,” it’s fast triage: detect obvious root cause candidates immediately.
+      </p>
+
+      <div class="grid">
+        <div class="tile">
+          <h3>Disk pressure</h3>
+          <p><strong>HIGH</strong> if any mount &gt; 85%.</p>
+        </div>
+        <div class="tile">
+          <h3>OOM / memory</h3>
+          <p><strong>HIGH</strong> if dmesg shows OOM kills or free memory is critically low.</p>
+        </div>
+        <div class="tile">
+          <h3>Restart loops</h3>
+          <p><strong>MED/HIGH</strong> if systemd shows repeated restarts within the timeframe.</p>
+        </div>
+      </div>
+
+      <h3 class="sectionTitle">7) Validation Steps (How I Prove It Works)</h3>
+      <p class="sub">
+        I validate this tool like production automation:
+        predictable outputs, safe permissions, no secrets leaking, and repeatable tests with known scenarios.
+      </p>
+
+      <div class="code">
+        <pre><code># 1) Dry-run safety: ensure script is read-only
+# - no rm/mv/chmod on system paths
+# - only writes under triage_* output dir
+
+# 2) Run on a known-good host (baseline)
+bash triage.sh --since "1h"
+# Expect: no HIGH severity flags, report still generated
+
+# 3) Create a controlled failure (non-destructive)
+# Example A: fill a temp filesystem (if safe in your lab)
+# Example B: restart a test service repeatedly and confirm "restart loop" flag
+for i in $(seq 1 5); do sudo systemctl restart cron; sleep 2; done
+bash triage.sh --since "15m" --service cron
+
+# 4) Validate JSON format
+# (use jq if available)
+command -v jq >/dev/null 2>&1 && jq . triage_*/report.json >/dev/null
+
+# 5) Secret hygiene check (basic)
+# Ensure report files do not contain tokens/passwords
+grep -RniE "token|password|secret|authorization: bearer" triage_* || true</code></pre>
+      </div>
+
+      <h3 class="sectionTitle">8) CI Add-on (Optional, Portfolio Booster)</h3>
+      <p class="sub">
+        Add GitHub Actions + ShellCheck so the script stays clean and reviewable.
+        (I include this because employers want to see maintainability, not just “it works on my laptop.”)
+      </p>
+
+      <div class="code">
+        <pre><code># Suggested repo additions:
+# .github/workflows/shellcheck.yml
+# Run shellcheck on triage.sh and fail PRs if issues are found.</code></pre>
+      </div>
+
+      <footer class="footer">
+        <div><strong>What this proves:</strong> I can troubleshoot like an SRE/support engineer, automate evidence collection, and produce clean incident artifacts.</div>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>
