@@ -66,3 +66,112 @@ Purpose:
 	•	Identify CPU-heavy processes
 	•	Capture system load snapshot
 
+5. Networking Diagnostics
+
+Verify interfaces, routing, and listening ports.
+
+ip a
+ip r
+ss -tulpn
+
+These commands reveal:
+	•	network interfaces
+	•	routing table
+	•	open ports and services
+Example:
+ss -tulpn
+tcp LISTEN 0 128 0.0.0.0:22 users:(("sshd",pid=832))
+
+6. Kernel & Hardware Signals
+
+Kernel logs can reveal driver failures or system crashes.
+
+dmesg | tail -50
+Look for:
+	•	OOM killer events
+	•	disk errors
+	•	hardware faults
+
+Example:
+Out of memory: Kill process 1345 (java)
+
+⸻
+
+7. Service Failure Analysis
+
+Inspect systemd logs.
+journalctl -xe | tail -200
+Purpose:
+	•	identify repeated service restarts
+	•	detect dependency failures
+
+⸻
+
+8. Security Signals
+
+Look for suspicious last -n 10
+grep "Failed password" /var/log/auth.log
+
+Detect:
+	•	brute-force SSH attempts
+	•	unexpected user logins
+
+Example:
+Failed password for root from 185.220.101.1
+
+⸻
+
+9. Report Generation
+
+The toolkit generates two outputs:
+
+Markdown Report
+report.md
+Human readable diagnostic summary.
+
+JSON Report
+report.json
+Machine readable data for automation or monitoring pipelines.
+
+⸻
+
+10. Evidence Bundle
+
+All artifacts are archived for investigation.
+tar -czf triage-evidence.tar.gz reports logs
+
+Contents include:
+	•	system snapshot
+	•	logs
+	•	networking data
+	•	process list
+
+⸻
+
+Summary
+
+This toolkit demonstrates practical SRE troubleshooting methodology:
+	1.	Collect system context
+	2.	Detect anomalies
+	3.	Preserve evidence
+	4.	Produce structured reports
+
+The goal is to accelerate incident response and provide reproducible diagnostics.
+
+---
+
+## Why this matters for your portfolio
+This shows employers you understand:
+
+- Linux troubleshooting methodology
+- incident triage workflow
+- system observability
+- automation with bash
+- evidence collection and reporting
+
+Which aligns **exactly with SRE / support engineer / platform roles**.
+
+---
+
+If you'd like, I can also generate **three additional Linux projects for this portfolio** that will make it look like a **senior systems / SRE portfolio instead of a single script demo**.
+
