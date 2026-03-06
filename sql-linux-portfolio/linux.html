@@ -36,95 +36,66 @@
       <h2 class="h1" style="margin-top:10px;">Linux / SysAdmin Projects</h2>
       <p class="sub">
         Projects are documented like real incident work: commands + outputs, scripts/configs, and RCA (“what broke and how I fixed it”).
-        Add scripts under each project folder for easy review and downloads.
+        Each case study is built for hiring teams to review quickly, with practical evidence and reproducible steps.
       </p>
 
       <h3 class="sectionTitle">Projects</h3>
-     <div class="list">
-  <div class="item">
-    <div class="left">
-      <h3>Incident Triage Kit</h3>
-      <p>
-        A Linux incident response toolkit that collects system evidence,
-        checks logs, flags common issues like disk pressure and OOM kills,
-        and generates both markdown and JSON reports.
-      </p>
-      <div class="meta" style="margin-top:10px;">
-        <span class="tag">Linux</span>
-        <span class="tag">Bash</span>
-        <span class="tag">Troubleshooting</span>
-        <span class="tag">Incident Response</span>
-      </div>
-    </div>
-    <div class="right">
-     <a class="link" href="./projects/linux/log-triage-toolkit/index.html">Open Case Study</a>
-      
-    </div>
-  </div>
-</div>
-      <h3 class="sectionTitle">Project Files</h3>
-
-<div class="list">
-
-  <div class="item">
-    <div class="left">
-      <h3>triage.sh</h3>
-      <p>
-        Bash incident triage toolkit that collects system diagnostics,
-        logs, network state, and security signals.
-      </p>
-    </div>
-    <div class="right">
-      <a class="link" href="./scripts/triage.sh" target="_blank">
-        View Script
-      </a>
-    </div>
-  </div>
-
-  <div class="item">
-    <div class="left">
-      <h3>commands.md</h3>
-      <p>
-        Documentation describing the Linux commands used by the toolkit
-        during system troubleshooting.
-      </p>
-    </div>
-    <div class="right">
-      <a class="link" href="./commands.md" target="_blank">
-        View Documentation
-      </a>
-    </div>
-  </div>
-
-</div>
-
+      <div class="list">
         <div class="item">
           <div class="left">
-            <h3>Coming Soon: systemd Service Debugging</h3>
+            <h3>Incident Triage Kit</h3>
             <p>
-              Build a service unit, debug failures, document fixes, and validate the solution with logs and exit codes.
+              A Linux incident response toolkit that collects system identity, resource usage, networking details,
+              journald logs, security signals, and optional service-specific evidence. It flags common issues such as
+              disk pressure, OOM kills, restart loops, and suspicious SSH activity, then generates both markdown and JSON reports.
             </p>
             <div class="meta" style="margin-top:10px;">
-              <span class="tag">systemd</span><span class="tag">ExecStart</span><span class="tag">Permissions</span>
+              <span class="tag">Linux</span>
+              <span class="tag">Bash</span>
+              <span class="tag">Troubleshooting</span>
+              <span class="tag">Incident Response</span>
             </div>
           </div>
           <div class="right">
-            <span class="small">Add under: <code>projects/linux/systemd-debugging/</code></span>
+            <a class="link" href="./projects/linux/log-triage-toolkit/index.html">Open Case Study</a>
           </div>
         </div>
 
         <div class="item">
           <div class="left">
-            <h3>Coming Soon: Hardening Baseline</h3>
+            <h3>Systemd Service Debugging</h3>
             <p>
-              SSH hardening, firewall rules, fail2ban, least privilege, and validation checks with before/after evidence.
+              Placeholder for a future case study focused on diagnosing failed units, analyzing restart behavior,
+              validating ExecStart paths, permissions, environment variables, and proving the fix with logs and exit codes.
             </p>
             <div class="meta" style="margin-top:10px;">
-              <span class="tag">sshd</span><span class="tag">firewalld</span><span class="tag">fail2ban</span>
+              <span class="tag">systemd</span>
+              <span class="tag">ExecStart</span>
+              <span class="tag">Permissions</span>
+              <span class="tag">Service Recovery</span>
             </div>
           </div>
           <div class="right">
-            <span class="small">Add under: <code>projects/linux/hardening-baseline/</code></span>
+            <span class="small">Coming soon</span>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="left">
+            <h3>Hardening Baseline</h3>
+            <p>
+              Placeholder for a future Linux hardening project covering SSH configuration, firewall rules,
+              fail2ban, least privilege, and validation checks with before/after evidence.
+            </p>
+            <div class="meta" style="margin-top:10px;">
+              <span class="tag">sshd</span>
+              <span class="tag">firewalld</span>
+              <span class="tag">fail2ban</span>
+              <span class="tag">Security</span>
+            </div>
+          </div>
+          <div class="right">
+            <span class="small">Coming soon</span>
           </div>
         </div>
       </div>
@@ -135,22 +106,30 @@
       <div class="grid">
         <div class="tile">
           <h3>commands.md</h3>
-          <p>Command history + outputs. Keep it clean and labeled by step and purpose.</p>
+          <p>Document the exact Linux commands used, why they matter, and what signals you looked for.</p>
         </div>
         <div class="tile">
           <h3>scripts/</h3>
-          <p>Store Bash/Python scripts with comments and safe defaults (read-only mode when possible).</p>
+          <p>Store Bash or Python utilities with comments, safe defaults, and a structure that is easy to review.</p>
         </div>
         <div class="tile">
           <h3>errors + fixes</h3>
-          <p>Include common errors you hit and the verified fixes. Hiring teams love real troubleshooting.</p>
+          <p>Capture the problem, the evidence, the fix, and how you validated that the issue was really resolved.</p>
         </div>
       </div>
 
       <footer class="footer">
-        <div>Tip: Put screenshots inside each project folder and reference them with <code>./image.png</code> to avoid broken paths.</div>
+        <div>Tip: Put screenshots and supporting files inside each project folder and use relative links like <code>./file-name</code> for reliability.</div>
       </footer>
     </div>
   </main>
 </body>
 </html>
+
+
+
+
+
+
+
+
