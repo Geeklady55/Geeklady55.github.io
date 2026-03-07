@@ -1,1 +1,82 @@
 
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Linux Case Study: Systemd Service Debugging</title>
+<link rel="stylesheet" href="../../../assets/css/styles.css">
+</head>
+
+<body>
+
+<div class="topbar">
+<div class="nav">
+
+<a class="brand" href="/sql-linux-portfolio/">
+<h1>SQL + Linux Portfolio</h1>
+</a>
+
+<div class="navlinks">
+<a class="pill" href="/sql-linux-portfolio/">Home</a>
+<a class="pill" href="/sql-linux-portfolio/sql.html">SQL</a>
+<a class="pill active" href="/sql-linux-portfolio/linux.html">Linux</a>
+<a class="pill" href="/sql-linux-portfolio/about.html">About</a>
+<a class="pill" href="https://github.com/Geeklady55" target="_blank">GitHub</a>
+</div>
+
+</div>
+</div>
+
+<main class="container">
+
+<h1>Linux Case Study: Debugging a Failed systemd Service</h1>
+
+<h3>Problem</h3>
+
+<p>
+A custom application service repeatedly failed during startup.
+systemd logs indicated exit code failures.
+</p>
+
+<h3>Investigation</h3>
+
+<ul>
+<li>Checked service status</li>
+<li>Reviewed journald logs</li>
+<li>Verified ExecStart path</li>
+<li>Checked file permissions</li>
+</ul>
+
+<h3>Commands Used</h3>
+
+<pre>
+systemctl status myapp.service
+journalctl -u myapp.service
+systemctl daemon-reload
+</pre>
+
+<h3>Fix</h3>
+
+<p>
+The service ExecStart path referenced a binary without execute permission.
+Permissions were corrected and service restarted successfully.
+</p>
+
+<div class="ctaRow">
+
+<a class="btn" href="./commands.md">View Commands</a>
+
+<a class="btn" href="./scripts/debug-service.sh">Download Script</a>
+
+<a class="btn" href="/sql-linux-portfolio/linux.html">Back to Linux</a>
+
+</div>
+
+</main>
+
+</body>
+</html>
+
+
+
