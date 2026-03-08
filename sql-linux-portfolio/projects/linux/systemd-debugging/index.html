@@ -1,1 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Linux Case Study: Systemd Service Debugging</title>
+  <link rel="stylesheet" href="/sql-linux-portfolio/assets/css/styles.css" />
+</head>
+<body>
+  <div class="topbar">
+    <div class="nav">
+      <a class="brand" href="/sql-linux-portfolio/">
+        <span class="logo" aria-hidden="true"></span>
+        <div>
+          <h1>SQL + Linux Portfolio</h1>
+          <span class="mini">Advanced queries • SysAdmin projects • Step-by-step case studies</span>
+        </div>
+      </a>
+      <div class="navlinks">
+        <a class="pill" href="/sql-linux-portfolio/">Home</a>
+        <a class="pill" href="/sql-linux-portfolio/sql.html">SQL</a>
+        <a class="pill active" href="/sql-linux-portfolio/linux.html">Linux</a>
+        <a class="pill" href="/sql-linux-portfolio/about.html">About</a>
+        <a class="pill" href="https://github.com/Geeklady55" target="_blank" rel="noreferrer">GitHub</a>
+      </div>
+    </div>
+  </div>
+
+  <main class="container">
+    <div class="card">
+      <div class="breadcrumb">
+        <a href="/sql-linux-portfolio/">Home</a><span>›</span>
+        <a href="/sql-linux-portfolio/linux.html">Linux</a><span>›</span>
+        <span>Systemd Service Debugging</span>
+      </div>
+
+      <h2 class="h1" style="margin-top:10px;">Linux Case Study: Systemd Service Debugging</h2>
+
+      <p class="sub">
+        This case study shows how I investigate a failed Linux service using systemctl,
+        journald, permissions checks, and restart validation.
+      </p>
+
+      <div class="ctaRow">
+        <a class="btn" href="./commands.md" target="_blank">View Commands</a>
+        <a class="btn" href="/sql-linux-portfolio/linux.html">Back to Linux</a>
+      </div>
+
+      <hr class="sep" />
+
+      <h3 class="sectionTitle">Problem</h3>
+      <p class="sub">
+        A service repeatedly failed to start and entered a restart loop after a deployment.
+      </p>
+
+      <h3 class="sectionTitle">Investigation</h3>
+      <div class="code">
+<pre><code>systemctl status myapp.service
+journalctl -u myapp.service --since "1 hour ago"
+systemctl show myapp.service -p ExecMainStatus -p NRestarts
+ls -l /opt/myapp/bin/myapp
+</code></pre>
+      </div>
+
+      <h3 class="sectionTitle">Fix</h3>
+      <p class="sub">
+        The ExecStart target did not have the correct execute permissions. After correcting permissions
+        and reloading systemd, the service started successfully.
+      </p>
+
+      <h3 class="sectionTitle">Validation</h3>
+      <div class="code">
+<pre><code>chmod +x /opt/myapp/bin/myapp
+systemctl daemon-reload
+systemctl restart myapp.service
+systemctl status myapp.service
+journalctl -u myapp.service --since "10 minutes ago"
+</code></pre>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
+
+
+
 
