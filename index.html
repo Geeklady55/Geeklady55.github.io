@@ -332,6 +332,8 @@
         <a class="btn primary" href="https://github.com/YOUR_GITHUB_USERNAME/ai-multi-persona-chatbot-platform" target="_blank" rel="noopener">
           View on GitHub →
         </a>
+        <a href="#build">How I Built It</a>
+        
       </nav>
     </header>
 
@@ -802,9 +804,140 @@ My goal was simple: build something that reflects how I think — secure, scalab
   <script>
     document.getElementById("yr").textContent = new Date().getFullYear();
   </script>
+<section id="build" class="section">
+  <h2>How I Built This AI Chatbot Platform</h2>
+
+  <p>
+    I created this project to demonstrate how an AI chatbot can be built using modern backend architecture, secure APIs, document retrieval, and image generation workflows.
+  </p>
+
+  <h3>Step 1: Define the Goal</h3>
+  <p>
+    The goal was to build a multi-persona AI chatbot that could support different conversation styles, retrieve helpful context from documents, stream responses, and integrate image creation.
+  </p>
+
+  <h3>Step 2: Choose the Platforms and Tools</h3>
+  <p>
+    I used FastAPI for the backend API, Python for application logic, FAISS for vector search, Sentence Transformers for embeddings, ComfyUI for image generation workflows, JWT for authentication, Docker for containerization, GitHub for version control, and GitHub Pages for the portfolio website.
+  </p>
+
+  <h3>Step 3: Build the Chat API</h3>
+  <p>
+    I created an API that accepts a user message and selected persona, then routes the request to the chatbot logic.
+  </p>
+
+  <pre><code>from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class ChatRequest(BaseModel):
+    message: str
+    persona: str
+
+@app.post("/chat")
+async def chat(request: ChatRequest):
+    return {"response": f"{request.persona} says: {request.message}"}</code></pre>
+
+  <h3>Step 4: Add Multi-Persona Chat Logic</h3>
+  <p>
+    I added different personas so the chatbot could respond like a technical architect, developer assistant, or support engineer.
+  </p>
+
+  <pre><code>personas = {
+    "architect": "You are a senior software architect.",
+    "developer": "You are a helpful developer assistant.",
+    "support": "You are a friendly support engineer."
+}
+
+def build_prompt(persona, message):
+    system_prompt = personas.get(persona, "")
+    return f"{system_prompt}\nUser: {message}"</code></pre>
+
+  <h3>Step 5: Add Document Retrieval (RAG)</h3>
+  <p>
+    I used embeddings and vector search so the chatbot could retrieve useful context from uploaded documents before generating a response.
+  </p>
+
+  <pre><code>from sentence_transformers import SentenceTransformer
+import faiss
+
+model = SentenceTransformer("all-MiniLM-L6-v2")
+embeddings = model.encode(text_chunks)
+
+index = faiss.IndexFlatL2(384)
+index.add(embeddings)</code></pre>
+
+  <h3>Step 6: Add Streaming Responses</h3>
+  <p>
+    I added streaming so responses could appear progressively instead of making the user wait for the full answer.
+  </p>
+
+  <pre><code>from fastapi.responses import StreamingResponse
+
+async def stream_response():
+    for word in ["Hello", "this", "is", "a", "stream"]:
+        yield word + " "
+
+@app.get("/stream")
+async def stream():
+    return StreamingResponse(stream_response())</code></pre>
+
+  <h3>Step 7: Integrate Image Creation</h3>
+  <p>
+    I used ComfyUI workflows to support AI image generation. The backend can send prompts to the image generation system and return the generated results.
+  </p>
+
+  <pre><code>import requests
+
+response = requests.post(
+    "http://localhost:8188/prompt",
+    json={"prompt": "cyberpunk city skyline"}
+)</code></pre>
+
+  <h3>Step 8: Secure the API</h3>
+  <p>
+    I used JWT authentication to protect endpoints and control access to the chatbot platform.
+  </p>
+
+  <pre><code>from fastapi.security import HTTPBearer
+
+security = HTTPBearer()</code></pre>
+
+  <h3>Step 9: Add Logging and Observability</h3>
+  <p>
+    I used structured logs to track requests, errors, and chatbot behavior for easier troubleshooting.
+  </p>
+
+  <pre><code>2026-02-28 INFO request_id=1234 chat_request persona=architect
+2026-02-28 INFO rag_retrieval chunks=3
+2026-02-28 INFO response_stream_started</code></pre>
+
+  <h3>Step 10: Containerize and Publish</h3>
+  <p>
+    I used Docker to run the chatbot consistently and GitHub Pages to publish the project portfolio and documentation.
+  </p>
+
+  <pre><code>FROM python:3.11
+
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]</code></pre>
+
+  <h3>What This Project Demonstrates</h3>
+  <p>
+    This project demonstrates AI platform engineering, backend API development, vector search, multi-persona prompt design, image generation integration, structured logging, and production-minded system design.
+  </p>
+</section>
+
+
+
         
 </body>
 </html>
+
 
 
 
