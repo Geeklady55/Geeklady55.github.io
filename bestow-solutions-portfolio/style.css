@@ -38,7 +38,19 @@ section {
   border-radius: 8px;
   margin-top: 1rem;
 }
+.resume-btn {
+  display: inline-block;
+  background: #2563eb;
+  color: white;
+  padding: 10px 18px;
+  border-radius: 6px;
+  text-decoration: none;
+  margin-top: 10px;
+}
 
+.resume-btn:hover {
+  background: #1d4ed8;
+}
 a {
   color: #2563eb;
 }
