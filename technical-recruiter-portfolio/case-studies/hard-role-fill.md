@@ -13,6 +13,7 @@ Technical Recruiter | Technical Talent Partner
 
 ---
 
+
 Welcome to my technical recruiting portfolio.
 
 # Case Study: Filling a Difficult Technical Role
