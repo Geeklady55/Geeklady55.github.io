@@ -12,6 +12,7 @@ Technical Recruiter | Technical Talent Partner
 
 ---
 
+
 Welcome to my technical recruiting portfolio.
 
 # Recruiting Philosophy
