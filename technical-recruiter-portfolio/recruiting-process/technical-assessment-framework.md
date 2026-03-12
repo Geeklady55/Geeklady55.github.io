@@ -4,12 +4,12 @@ Technical Recruiter | Technical Talent Partner
 
 ---
 
-[Home](index.md) | 
-[About](about.md) | 
-[Recruiting Philosophy](recruiting-philosophy.md) | 
-[Case Studies](case-studies/hard-role-fill.md) | 
-[Technical Framework](recruiting-process/technical-assessment-framework.md) | 
-[Resume](Colleen-Cummings-Technical-Recruiter-Resume.pdf)
+[Home](../index.md) | 
+[About](../about.md) | 
+[Recruiting Philosophy](../recruiting-philosophy.md) | 
+[Case Study](../case-studies/hard-role-fill.md) | 
+[Technical Framework](../recruiting-process/technical-assessment-framework.md) | 
+[Resume](../Colleen-Cummings-Technical-Recruiter-Resume.pdf)
 
 ---
 
