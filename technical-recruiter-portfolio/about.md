@@ -45,4 +45,4 @@ My background allows me to approach recruiting differently from many traditional
 
 ---
 
-[← Back to Home](../index.md)
+[← Back to Home](index.md)
