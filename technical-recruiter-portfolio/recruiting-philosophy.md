@@ -31,4 +31,4 @@ I believe the best recruiters act as strategic partners who improve hiring quali
 
 ---
 
-[← Back to Home](../index.md)
+[← Back to Home](index.md)
