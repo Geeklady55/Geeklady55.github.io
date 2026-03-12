@@ -47,3 +47,7 @@ Support the hiring process for a difficult-to-fill technical role requiring stro
 ## Outcome
 
 This approach improved candidate quality and helped narrow the funnel toward candidates with stronger technical and communication alignment.
+
+---
+
+[← Back to Home](../index.md)
