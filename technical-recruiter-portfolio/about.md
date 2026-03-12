@@ -42,3 +42,7 @@ My background allows me to approach recruiting differently from many traditional
 - Software Engineer
 - Site Reliability Engineer
 - Technical Account Manager
+
+---
+
+[← Back to Home](../index.md)
