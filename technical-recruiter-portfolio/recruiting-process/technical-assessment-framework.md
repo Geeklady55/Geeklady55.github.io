@@ -55,3 +55,7 @@ Does the candidate's background match the actual needs of the team?
 - Strong communication
 - Relevant technical depth
 - Good judgment
+
+---
+
+[← Back to Home](../index.md)
