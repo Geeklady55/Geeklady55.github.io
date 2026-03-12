@@ -3,6 +3,7 @@ Technical Recruiter | Technical Talent Partner
 
 ---
 
+
 [Home](index.md) | 
 [About](about.md) | 
 [Recruiting Philosophy](recruiting-philosophy.md) | 
