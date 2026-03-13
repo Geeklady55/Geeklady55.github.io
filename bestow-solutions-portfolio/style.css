@@ -58,3 +58,25 @@ a {
 h1, h2, h3 {
   margin-top: 0;
 }
+
+.contact-btn {
+
+display:inline-block;
+background:#2563eb;
+color:white;
+padding:10px 20px;
+margin:8px 8px 0 0;
+border-radius:8px;
+text-decoration:none;
+font-weight:500;
+transition:.2s;
+box-shadow:0 2px 6px rgba(0,0,0,.1);
+
+}
+
+.contact-btn:hover{
+
+background:#1d4ed8;
+transform:translateY(-1px);
+
+}
